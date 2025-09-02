@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Src/BBox.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/BBox.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Collision.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/DInput.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/DInput.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Direct3D.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Direct3D.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/FbxMesh.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/FbxMesh.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Main.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/MeshCollider.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/MeshCollider.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/MyImgui.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/MyImgui.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Object3D.CPP" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Object3D.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/ObjectManager.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Player.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/SceneFactory.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/SceneManager.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/SceneManager.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Shader.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Sprite3D.h" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Stage.cpp" charset="Shift_JIS" />
+    <file url="file://$PROJECT_DIR$/Src/Stage.h" charset="Shift_JIS" />
+  </component>
+</project>
