@@ -67,9 +67,8 @@ void EditorStage::CheckData()
         {
             int tmpStageData = m_pStageData->ReturnData(z, x);
             //ステージデータが空の場合
-            if (tmpStageData == 0)return;
-            ProcessStageData(x, z, tmpStageData);
-
+            if (tmpStageData == 0) continue;
+                ProcessStageData(x * 10, z * 10, tmpStageData);
         }
     }
 }

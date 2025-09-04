@@ -1,30 +1,52 @@
 #include "EditorObjectMove.h"
 #include <cmath>
 
+namespace
+{
+    // 定数定義
+    static constexpr int GRID_SIZE = 10;
+    static constexpr int SNAP_THRESHOLD = 5;
+    static constexpr int EMPTY_CELL = 0;
+}
+
+// コンストラクタ - 初期化処理
 EditorObjectMove::EditorObjectMove()
 {
     m_worldPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
     m_pStageData = ObjectManager::FindGameObject<EditorStageData>();
     m_pStage = ObjectManager::FindGameObject<EditorStage>();
     holdObject = false;
+
+
+    // 追加：テクスチャ関連の初期化
+    m_pButtonTexture = nullptr;
+    m_bTextureLoaded = false;
+    
+    // ボタン用テクスチャを読み込み（例：Assets/button.png）
+    LoadButtonTexture("Data/sample1.jpg");
+
 }
 
+// デストラクタ
 EditorObjectMove::~EditorObjectMove()
 {
+    ReleaseButtonTexture();
 }
 
+// 毎フレーム呼ばれる更新処理
 void EditorObjectMove::Update()
 {
     UpdateWorldPosition();
     DebugImgui();
-
 }
 
+// 描画処理
 void EditorObjectMove::Draw()
 {
     ObjectMove();
 }
 
+// マウス座標からワールド座標を計算
 void EditorObjectMove::UpdateWorldPosition()
 {
     POINT po;
@@ -42,6 +64,7 @@ void EditorObjectMove::UpdateWorldPosition()
     CalculateWorldPositionFromMouse(po, viewportWidth, viewportHeight, viewMatrix, projMatrix);
 }
 
+// マウス位置からワールド座標への変換計算
 void EditorObjectMove::CalculateWorldPositionFromMouse(const POINT& mousePos, float viewportWidth, float viewportHeight, 
                                                   const MATRIX4X4& viewMatrix, const MATRIX4X4& projMatrix)
 {
@@ -82,9 +105,9 @@ void EditorObjectMove::CalculateWorldPositionFromMouse(const POINT& mousePos, fl
     }
 }
 
+// デバッグ用のImGuiウィンドウ表示
 void EditorObjectMove::DebugImgui()
 {
-
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 10), ImGuiCond_FirstUseEver);
     ImGui::Begin("カーソル座標情報");
     
@@ -100,58 +123,149 @@ void EditorObjectMove::DebugImgui()
     ImGui::Text("ワールド座標: (%.3f, %.3f, %.3f)", 
                 m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
     ImGui::Separator();
-    ImGui::End();
-
-}
-
-int EditorObjectMove::CheckMousePos(int mousePos)
-{
-    int tmp = mousePos % 10;
-    if (tmp <5)return 0;
-    return 10;
-}
-
-void EditorObjectMove::ObjectMove()
-{
-    int width = ((int)m_worldPosition.x / 10) * 10 + CheckMousePos(m_worldPosition.x);
-    int height = ((int)m_worldPosition.z / 10) * 10 + CheckMousePos(m_worldPosition.z);
-    
-    // 左クリックした瞬間にオブジェクトを掴む
-    if (GameDevice()->m_pDI->CheckMouse(KD_TRG, DIM_LBUTTON) && !holdObject)
+    // 画像ボタンの作成
+    if (m_bTextureLoaded && m_pButtonTexture)
     {
-        if (height < 0 || width < 0 || height >= m_pStageData->stageData.size() || width >= m_pStageData->stageData[0].size())
-        {
-            return;
-        }
-        if (m_pStageData->stageData[height][width] == 0) return;
+        ImVec2 buttonSize(64, 64); // ボタンのサイズ
         
-        m_tmpStageData = m_pStageData->ReturnData(height, width);
-        m_pStageData->stageData[height][width] = 0;
-        holdObject = true;
+        if (ImGui::ImageButton( (ImTextureID)m_pButtonTexture, buttonSize))
+        {
+            // ボタンがクリックされた時の処理
+            // 例：何かの機能を実行
+            // DoSomething();
+        }
+    }
+    else
+    {
+        // テクスチャが読み込めない場合の代替ボタン
+        if (ImGui::Button("代替ボタン"))
+        {
+            // 代替処理
+        }
     }
     
-    // 左クリックを離した瞬間にオブジェクトを配置
-    if (GameDevice()->m_pDI->CheckMouse(KD_UTRG, DIM_LBUTTON) && holdObject)
+    ImGui::End();
+}
+
+// マウス位置のグリッドスナップ処理
+int EditorObjectMove::CheckMousePos(int mousePos)
+{
+    int tmp = mousePos % GRID_SIZE;
+    if (tmp < SNAP_THRESHOLD) return 0;
+    return GRID_SIZE;
+}
+
+// ワールド座標からグリッド座標への変換
+int EditorObjectMove::CalculateGridPosition(float worldPos)
+{
+    return (((int)worldPos / GRID_SIZE) * GRID_SIZE + CheckMousePos(worldPos)) / GRID_SIZE;
+}
+
+// グリッド位置が有効範囲内かチェック
+bool EditorObjectMove::IsValidGridPosition(int depth, int width)
+{
+    return (depth >= 0 && width >= 0 && 
+            depth < m_pStageData->stageData.size() && 
+            width < m_pStageData->stageData[0].size());
+}
+
+// オブジェクトを掴む処理
+void EditorObjectMove::GrabObject(int depth, int width)
+{
+    m_tmpStageData = m_pStageData->ReturnData(depth, width);
+    m_pStageData->stageData[depth][width] = EMPTY_CELL;
+    m_tmpDepth = depth;
+    m_tmpWidth = width;
+    holdObject = true;
+}
+
+// オブジェクトを配置する処理
+void EditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
+{
+    if (IsValidGridPosition(placeDepth, placeWidth))
     {
-        int placeWidth = ((int)m_worldPosition.x / 10) * 10 + CheckMousePos(m_worldPosition.x);
-        int placeHeight = ((int)m_worldPosition.z / 10) * 10 + CheckMousePos(m_worldPosition.z);
-        
-        if (placeHeight >= 0 && placeWidth >= 0 && 
-            placeHeight < m_pStageData->stageData.size() && 
-            placeWidth < m_pStageData->stageData[0].size())
+        if (m_pStageData->stageData[placeDepth][placeWidth] == EMPTY_CELL)
         {
-            if (m_pStageData->stageData[placeHeight][placeWidth] == 0)
-            {
-                m_pStageData->stageData[placeHeight][placeWidth] = m_tmpStageData;
-            }
+            m_pStageData->stageData[placeDepth][placeWidth] = m_tmpStageData;
         }
-        holdObject = false;
+    }
+    else
+    {
+        // 配置位置が無効な場合は元の位置に戻す
+        m_pStageData->stageData[m_tmpDepth][m_tmpWidth] = m_tmpStageData;
+    }
+    holdObject = false;
+}
+
+// オブジェクトの移動処理（メイン処理）
+void EditorObjectMove::ObjectMove()
+{
+    int width = CalculateGridPosition(m_worldPosition.x);
+    int depth = CalculateGridPosition(m_worldPosition.z);
+    
+    // 左クリックした瞬間にオブジェクトを掴む
+    if (GameDevice()->m_pDI->CheckMouse(KD_TRG, DIM_LBUTTON))
+    {
+        if (!holdObject)
+        {
+            // オブジェクトを持っていない場合：つかむ処理
+            if (!IsValidGridPosition(depth, width)) return;
+            if (m_pStageData->stageData[depth][width] == EMPTY_CELL) return;
+            
+            GrabObject(depth, width);
+        }
+        else
+        {
+            // オブジェクトを持っている場合：配置処理
+            int placeWidth = CalculateGridPosition(m_worldPosition.x);
+            int placeDepth = CalculateGridPosition(m_worldPosition.z);
+            
+            PlaceObject(placeDepth, placeWidth);
+        }
     }
     
     // オブジェクトを持っている間は、常にマウス位置に表示
     if (holdObject)
     {
         m_pStage->ProcessStageData(m_worldPosition.x, m_worldPosition.z, m_tmpStageData);
+    }
+}
+
+bool EditorObjectMove::LoadButtonTexture(const TCHAR* texturePath)
+{
+    // 既にテクスチャが読み込まれている場合は解放
+    ReleaseButtonTexture();
+    
+    DWORD imageWidth, imageHeight;
+    
+    // CDirect3Dクラスのメソッドを使用してテクスチャを読み込み
+    HRESULT hr = GameDevice()->m_pD3D->CreateShaderResourceViewFromFile(
+        texturePath, 
+        &m_pButtonTexture, 
+        imageWidth, 
+        imageHeight
+    );
+    
+    if (SUCCEEDED(hr))
+    {
+        m_bTextureLoaded = true;
+        return true;
+    }
+    else
+    {
+        m_bTextureLoaded = false;
+        return false;
+    }
+
+}
+
+void EditorObjectMove::ReleaseButtonTexture()
+{
+    if (m_pButtonTexture)
+    {
+        m_pButtonTexture->Release();
+        m_pButtonTexture = nullptr;
+        m_bTextureLoaded = false;
     }
 
 }

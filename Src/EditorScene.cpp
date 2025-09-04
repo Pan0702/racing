@@ -44,14 +44,14 @@ void EditorScene::Update()
 
 void EditorScene::Draw()
 {
-    DrawLine(VECTOR3(0, 0, 0), VECTOR3(0, 0, m_depthBlockNum), RGB(0, 0, 0));
+    //DrawLine(VECTOR3(0, 0, 0), VECTOR3(0, 0, m_depthBlockNum), RGB(0, 0, 0));
     for (int i = 0; i <= m_widthBlockNum; i++)
     {
-        DrawLine(VECTOR3(i * 10,0,0), VECTOR3(i * 10, 0, -m_depthBlockNum * 10), RGB(255,255,255));
+        DrawLine(VECTOR3(i * 10,0,-10), VECTOR3(i * 10, 0, m_depthBlockNum * 10 - 10), RGB(255,255,255));
     }
-    for (int i = 0; i <= m_depthBlockNum; i++)
+    for (int i = -1; i < m_depthBlockNum; i++)
     {
-        DrawLine(VECTOR3(0, 0, -i * 10), VECTOR3(m_widthBlockNum * 10, 0, -i * 10), RGB(0, 255, 0));
+        DrawLine(VECTOR3(0, 0, i * 10), VECTOR3(m_widthBlockNum * 10, 0, i * 10), RGB(0, 255, 0));
     }
 }
 
