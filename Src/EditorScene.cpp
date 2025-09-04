@@ -4,6 +4,7 @@
 #include "EditorObjectMove.h"
 #include "EditorStage.h"
 #include "EditorStageData.h"
+#include "EditorChangeWorldCoordinate.h"
 
 EditorScene::EditorScene()
 {
@@ -15,6 +16,7 @@ EditorScene::EditorScene()
     new EditorCamera();
     new EditorStage();
     new EditorObjectMove();
+    new EditorChangeWorldCoordinate();
 
     m_pStageData = ObjectManager::FindGameObject<EditorStageData>();
 }

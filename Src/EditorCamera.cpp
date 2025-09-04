@@ -8,7 +8,7 @@ namespace
     constexpr  float sensitivity = 0.05f;
     constexpr int notMove = 0;
     constexpr float movementAmount = 0.5f;
-    constexpr float fastSensitivity = 0.5f;
+
 }
 EditorCamera::EditorCamera()
 {
@@ -45,19 +45,20 @@ void EditorCamera::Update()
     }else if (isPushShift && mouseState.lZ != notMove)
     {
         //高速前後移動
-        m_comeraPos.z += mouseState.lZ * fastSensitivity;
-    } else
-    {
-        //前後移動
         m_comeraPos.z += mouseState.lZ * sensitivity;
-    }
+    } 
 
     // ビューマトリックスの更新
+    ViewMatrixUpdate();
+}
+
+void EditorCamera::ViewMatrixUpdate()
+{
     GameDevice()->m_mView = XMMatrixLookAtLH(
-        initCamPos + m_comeraPos, 
-        initFocusPos + m_comeraPos, 
-        initUpVec
-    );
+    initCamPos + m_comeraPos, 
+    initFocusPos + m_comeraPos, 
+    initUpVec
+);
 }
 
 float EditorCamera::MouseMove(const int& oldCoordinates, const int& nowCoordinates)

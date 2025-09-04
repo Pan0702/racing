@@ -7,6 +7,7 @@ public:
     EditorCamera();
     ~EditorCamera();
     void Update()override;
+    void ViewMatrixUpdate(); 
     float MouseMove(const int& oldCoordinates, const int& nowCoordinates);
 
 private:
