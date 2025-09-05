@@ -1,23 +1,23 @@
 #include "EditorChangeWorldCoordinate.h"
 
-EditorChangeWorldCoordinate::EditorChangeWorldCoordinate()
+CEditorChangeWorldCoordinate::CEditorChangeWorldCoordinate()
 {
     m_worldPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
 }
 
-EditorChangeWorldCoordinate::~EditorChangeWorldCoordinate()
+CEditorChangeWorldCoordinate::~CEditorChangeWorldCoordinate()
 {
 
 }
 
-void EditorChangeWorldCoordinate::Update()
+void CEditorChangeWorldCoordinate::Update()
 {
     UpdateWorldPosition();
     DebugImgui();
 }
 
 // マウス座標からワールド座標を計算
-void EditorChangeWorldCoordinate::UpdateWorldPosition()
+void CEditorChangeWorldCoordinate::UpdateWorldPosition()
 {
     POINT po;
     GetCursorPos(&po);
@@ -33,7 +33,7 @@ void EditorChangeWorldCoordinate::UpdateWorldPosition()
     CalRyCast(ndc, invViewProj);
 }
 
-XMMATRIX EditorChangeWorldCoordinate::CalInverseMatrix(const MATRIX4X4& viewMatrix,const MATRIX4X4& projMatrix)
+XMMATRIX CEditorChangeWorldCoordinate::CalInverseMatrix(const MATRIX4X4& viewMatrix,const MATRIX4X4& projMatrix)
 {
     // 逆変換行列を計算
     XMMATRIX viewMat = XMLoadFloat4x4(&viewMatrix);
@@ -41,7 +41,7 @@ XMMATRIX EditorChangeWorldCoordinate::CalInverseMatrix(const MATRIX4X4& viewMatr
     return  XMMatrixInverse(nullptr, XMMatrixMultiply(viewMat, projMat));
 }
 
-void EditorChangeWorldCoordinate::CalRyCast(const VECTOR2& ndc, const XMMATRIX& invViewProj)
+void CEditorChangeWorldCoordinate::CalRyCast(const VECTOR2& ndc, const XMMATRIX& invViewProj)
 {
 
     // レイキャスト計算
@@ -57,14 +57,14 @@ void EditorChangeWorldCoordinate::CalRyCast(const VECTOR2& ndc, const XMMATRIX& 
     CalculateWorldPositionFromMouse(nearPoint,XMVector3Normalize(XMVectorSubtract(farPoint, nearPoint)));
 }
 
-VECTOR2 EditorChangeWorldCoordinate::ChangeXandYCoordinates(float width,float depth,const POINT& mousePos)
+VECTOR2 CEditorChangeWorldCoordinate::ChangeXandYCoordinates(float width,float depth,const POINT& mousePos)
 {
     // NDC座標に変換
     return VECTOR2((2.0f * (float)mousePos.x / width) - 1.0f, 1.0f - (2.0f * (float)mousePos.y / depth));
 }
 
 // マウス位置からワールド座標への変換計算
-void EditorChangeWorldCoordinate::CalculateWorldPositionFromMouse(XMVECTOR nearPoint, const XMVECTOR& rayDirection)
+void CEditorChangeWorldCoordinate::CalculateWorldPositionFromMouse(XMVECTOR nearPoint, const XMVECTOR& rayDirection)
 {
     // Y=0平面との交点計算
     float rayY = XMVectorGetY(rayDirection);
@@ -83,7 +83,7 @@ void EditorChangeWorldCoordinate::CalculateWorldPositionFromMouse(XMVECTOR nearP
 }
 
 // デバッグ用のImGuiウィンドウ表示
-void EditorChangeWorldCoordinate::DebugImgui()
+void CEditorChangeWorldCoordinate::DebugImgui()
 {
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 10), ImGuiCond_FirstUseEver);
     ImGui::Begin("カーソル座標情報");

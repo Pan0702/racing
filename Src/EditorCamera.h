@@ -1,11 +1,11 @@
 #pragma once
 #include "Object3D.h"
 
-class EditorCamera:public Object3D
+class CEditorCamera:public Object3D
 {
 public:
-    EditorCamera();
-    ~EditorCamera();
+    CEditorCamera();
+    ~CEditorCamera();
     void Update()override;
     void ViewMatrixUpdate(); 
     float MouseMove(const int& oldCoordinates, const int& nowCoordinates);

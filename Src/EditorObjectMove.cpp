@@ -13,37 +13,37 @@ namespace
 }
 
 // コンストラクタ - 初期化処理
-EditorObjectMove::EditorObjectMove()
+CEditorObjectMove::CEditorObjectMove()
 {
     
-    m_pStageData = ObjectManager::FindGameObject<EditorStageData>();
-    m_pStage = ObjectManager::FindGameObject<EditorStage>();
+    m_pStageData = ObjectManager::FindGameObject<CEditorStageData>();
+    m_pStage = ObjectManager::FindGameObject<CEditorStage>();
     holdObject = false;
     
 }
 
 // デストラクタ
-EditorObjectMove::~EditorObjectMove()
+CEditorObjectMove::~CEditorObjectMove()
 {
 
 }
 
 // 毎フレーム呼ばれる更新処理
-void EditorObjectMove::Update()
+void CEditorObjectMove::Update()
 {
     m_worldPosition = ObjectManager::FindGameObject<EditorChangeWorldCoordinate>()->ReterndWorldPosition();
 
 }
 
 // 描画処理
-void EditorObjectMove::Draw()
+void CEditorObjectMove::Draw()
 {
     ObjectMove();
 }
 
 
 // マウス位置のグリッドスナップ処理
-int EditorObjectMove::CheckMousePos(int mousePos)
+int CEditorObjectMove::CheckMousePos(int mousePos)
 {
     int tmp = mousePos % GRID_SIZE;
     if (tmp < SNAP_THRESHOLD) return 0;
@@ -51,13 +51,13 @@ int EditorObjectMove::CheckMousePos(int mousePos)
 }
 
 // ワールド座標からグリッド座標への変換
-int EditorObjectMove::CalculateGridPosition(float worldPos)
+int CEditorObjectMove::CalculateGridPosition(float worldPos)
 {
     return (((int)worldPos / GRID_SIZE) * GRID_SIZE + CheckMousePos(worldPos)) / GRID_SIZE;
 }
 
 // グリッド位置が有効範囲内かチェック
-bool EditorObjectMove::IsValidGridPosition(int depth, int width)
+bool CEditorObjectMove::IsValidGridPosition(int depth, int width)
 {
     return (depth >= 0 && width >= 0 && 
             depth < m_pStageData->stageData.size() && 
@@ -65,7 +65,7 @@ bool EditorObjectMove::IsValidGridPosition(int depth, int width)
 }
 
 // オブジェクトを掴む処理
-void EditorObjectMove::GrabObject(int depth, int width)
+void CEditorObjectMove::GrabObject(int depth, int width)
 {
     m_tmpStageData = m_pStageData->ReturnData(depth, width);
     m_pStageData->stageData[depth][width] = EMPTY_CELL;
@@ -75,7 +75,7 @@ void EditorObjectMove::GrabObject(int depth, int width)
 }
 
 // オブジェクトを配置する処理
-void EditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
+void CEditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
 {
     if (IsValidGridPosition(placeDepth, placeWidth))
     {
@@ -93,7 +93,7 @@ void EditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
 }
 
 // オブジェクトの移動処理（メイン処理）
-void EditorObjectMove::ObjectMove()
+void CEditorObjectMove::ObjectMove()
 {
     
     // 左クリックした瞬間にオブジェクトを掴む

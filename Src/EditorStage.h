@@ -2,12 +2,12 @@
 #include "EditorStageData.h"
 #include "Object3D.h"
 
-class EditorStage:public Object3D
+class CEditorStage:public Object3D
 {
 public:
-    EditorStage();
+    CEditorStage();
     void InitializeMeshes();
-    ~EditorStage();
+    ~CEditorStage();
     void Update()override;
     void ProcessStageData(const int x, const int z, const int stageData);
     void Draw()override;
@@ -15,7 +15,7 @@ public:
 private:
     int m_widthSize;
     int m_depthSize;
-    EditorStageData* m_pStageData;
+    CEditorStageData* m_pStageData;
     
     void GetStageSize();
     void MeshPosSet(const int width, const int height,const int depth);

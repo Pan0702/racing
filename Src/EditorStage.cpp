@@ -6,13 +6,13 @@ namespace
     static constexpr int ANGLE_DIVISOR = 10;
     static constexpr int TYPE_MODULO = 10;
 }
-EditorStage::EditorStage()
+CEditorStage::CEditorStage()
 {
     InitializeMeshes();
-    m_pStageData = ObjectManager::FindGameObject<EditorStageData>();
+    m_pStageData = ObjectManager::FindGameObject<CEditorStageData>();
 }
 
-void EditorStage::InitializeMeshes()
+void CEditorStage::InitializeMeshes()
 {
     // メッシュ初期化の共通処理
     auto initMesh = [](CFbxMesh*& mesh, MeshCollider*& coll, const char* path) {
@@ -28,17 +28,17 @@ void EditorStage::InitializeMeshes()
 }
 
 
-EditorStage::~EditorStage()
+CEditorStage::~CEditorStage()
 {
 }
 
 
-void EditorStage::Update()
+void CEditorStage::Update()
 {
     GetStageSize();
 }
 
-void EditorStage::GetStageSize()
+void CEditorStage::GetStageSize()
 {
     if (m_pStageData != nullptr &&
     m_pStageData->stageData.size() != m_depthSize || m_pStageData->stageData[0].size() != m_widthSize)
@@ -48,13 +48,13 @@ void EditorStage::GetStageSize()
     }
 }
 
-void EditorStage::Draw()
+void CEditorStage::Draw()
 {
     CheckData();
 }
 
 
-void EditorStage::CheckData()
+void CEditorStage::CheckData()
 {
     if (m_pStageData == nullptr || m_depthSize <= 0 || m_widthSize <= 0)
     {
@@ -77,7 +77,7 @@ void EditorStage::CheckData()
 //二桁目:角度情報
 //０．０度、１．９０度、２．１８０度、３．２７０度
 //三桁目以降:高さ情報
-void EditorStage::ProcessStageData(const int x, const int z, int stageData)
+void CEditorStage::ProcessStageData(const int x, const int z, int stageData)
 {
     
     // 高さ情報（3桁目以降）
@@ -93,17 +93,17 @@ void EditorStage::ProcessStageData(const int x, const int z, int stageData)
     MeshRender(meshType);
 }
 
-void EditorStage::MeshPosSet(const int width, const int height,const int depth )
+void CEditorStage::MeshPosSet(const int width, const int height,const int depth )
 {
     transform.position = VECTOR3(width, height, depth);
 }
 
-void EditorStage::MeshDegSet(const int degNum)
+void CEditorStage::MeshDegSet(const int degNum)
 {
     transform.rotation.y = (degNum * 90) * DegToRad;
 }
 
-void EditorStage::MeshRender(const int meshNum)
+void CEditorStage::MeshRender(const int meshNum)
 {
     switch (meshNum)
     {

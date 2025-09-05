@@ -3,11 +3,11 @@
 #include "EditorStageData.h"
 #include "Object3D.h"
 
-class EditorObjectMove:public Object3D
+class CEditorObjectMove:public Object3D
 {
 public:
-    EditorObjectMove();
-    ~EditorObjectMove();
+    CEditorObjectMove();
+    ~CEditorObjectMove();
     void Update()override;
     void Draw()override;
     int CheckMousePos(int mousePos);
@@ -20,8 +20,8 @@ public:
 
 private:
     XMFLOAT3 m_worldPosition;
-    EditorStageData* m_pStageData;
-    EditorStage* m_pStage;
+    CEditorStageData* m_pStageData;
+    CEditorStage* m_pStage;
 
     bool holdObject;
     int m_tmpStageData;

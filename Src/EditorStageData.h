@@ -1,10 +1,10 @@
 #pragma once
 #include "Object3D.h"
 #include "vector"
-class EditorStageData:public Object3D
+class CEditorStageData:public Object3D
 {
 public:
-    EditorStageData(const int& X, const int& Y);
+    CEditorStageData(const int& X, const int& Y);
     
     //一桁目マップチップの種類
     //１，まっすぐな道、２．カーブ、３．ゴールライン

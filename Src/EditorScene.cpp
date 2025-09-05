@@ -1,31 +1,33 @@
 #include "EditorScene.h"
 
+#include "EditorButtonManager.h"
 #include "EditorCamera.h"
 #include "EditorObjectMove.h"
 #include "EditorStage.h"
 #include "EditorStageData.h"
 #include "EditorChangeWorldCoordinate.h"
 
-EditorScene::EditorScene()
+CEditorScene::CEditorScene()
 {
     m_depthBlockNum = 1;
     m_widthBlockNum = 1;
     m_lineStartPos = VECTOR3(-5, 0, 5);
     
-    new EditorStageData(m_widthBlockNum, m_depthBlockNum);
-    new EditorCamera();
-    new EditorStage();
-    new EditorObjectMove();
-    new EditorChangeWorldCoordinate();
+    new CEditorStageData(m_widthBlockNum, m_depthBlockNum);
+    new CEditorCamera();
+    new CEditorStage();
+    new CEditorObjectMove();
+    new CEditorChangeWorldCoordinate();
+    new CEditorButtonManager();
 
-    m_pStageData = ObjectManager::FindGameObject<EditorStageData>();
+    m_pStageData = ObjectManager::FindGameObject<CEditorStageData>();
 }
 
-EditorScene::~EditorScene()
+CEditorScene::~CEditorScene()
 {
 }
 
-void EditorScene::Update()
+void CEditorScene::Update()
 {
     
     // 左上
@@ -44,7 +46,7 @@ void EditorScene::Update()
     ImGui::End();
 }
 
-void EditorScene::Draw()
+void CEditorScene::Draw()
 {
     //DrawLine(VECTOR3(0, 0, 0), VECTOR3(0, 0, m_depthBlockNum), RGB(0, 0, 0));
     for (int i = 0; i <= m_widthBlockNum; i++)
@@ -57,13 +59,13 @@ void EditorScene::Draw()
     }
 }
 
-void EditorScene::DrawLine(const VECTOR3& start , const VECTOR3& end, const DWORD& color)
+void CEditorScene::DrawLine(const VECTOR3& start , const VECTOR3& end, const DWORD& color)
 {
     CSprite sprite;
     sprite.DrawLine3D(start + m_lineStartPos, end + m_lineStartPos, color);
 }
 
-void EditorScene::MapSizeChanged()
+void CEditorScene::MapSizeChanged()
 {
     m_pStageData->InitStageData(m_depthBlockNum, m_widthBlockNum);
 }

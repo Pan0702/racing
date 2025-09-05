@@ -10,7 +10,7 @@ namespace
     constexpr float movementAmount = 0.5f;
 
 }
-EditorCamera::EditorCamera()
+CEditorCamera::CEditorCamera()
 {
     m_comeraPos = VECTOR3(0, 0, 0);
     m_prevMouseX = 0;
@@ -19,11 +19,11 @@ EditorCamera::EditorCamera()
      
 }
 
-EditorCamera::~EditorCamera()
+CEditorCamera::~CEditorCamera()
 {
 }
 
-void EditorCamera::Update()
+void CEditorCamera::Update()
 {
     
     ::POINT po;
@@ -52,7 +52,7 @@ void EditorCamera::Update()
     ViewMatrixUpdate();
 }
 
-void EditorCamera::ViewMatrixUpdate()
+void CEditorCamera::ViewMatrixUpdate()
 {
     GameDevice()->m_mView = XMMatrixLookAtLH(
     initCamPos + m_comeraPos, 
@@ -61,7 +61,7 @@ void EditorCamera::ViewMatrixUpdate()
 );
 }
 
-float EditorCamera::MouseMove(const int& oldCoordinates, const int& nowCoordinates)
+float CEditorCamera::MouseMove(const int& oldCoordinates, const int& nowCoordinates)
 {
     if (oldCoordinates > nowCoordinates)
     {

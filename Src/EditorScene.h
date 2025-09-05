@@ -4,11 +4,11 @@
 #include <windows.h>
 #include "EditorStageData.h"
 
-class EditorScene:public SceneBase
+class CEditorScene:public SceneBase
 {
 public:
-    EditorScene();
-    ~EditorScene();
+    CEditorScene();
+    ~CEditorScene();
     void Update()override;
     void Draw()override;
     
@@ -22,6 +22,6 @@ private:
     int m_prevDepthBlockNum;
     int m_prevWidthBlockNum;
     VECTOR3 m_lineStartPos;
-    EditorStageData* m_pStageData;
+    CEditorStageData* m_pStageData;
     
 };

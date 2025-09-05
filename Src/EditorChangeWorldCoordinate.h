@@ -1,13 +1,13 @@
 #pragma once
 #include "Object3D.h"
 
-class EditorChangeWorldCoordinate:public Object3D
+class CEditorChangeWorldCoordinate:public Object3D
 {
 public:
-    EditorChangeWorldCoordinate();
+    CEditorChangeWorldCoordinate();
     XMFLOAT3 ReterndWorldPosition() {return m_worldPosition;};
 private:
-    ~EditorChangeWorldCoordinate();
+    ~CEditorChangeWorldCoordinate();
     void Update()override;
     void UpdateWorldPosition();
     XMMATRIX CalInverseMatrix(const MATRIX4X4& viewMatrix, const MATRIX4X4& projMatrix);
