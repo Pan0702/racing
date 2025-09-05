@@ -16,7 +16,7 @@ public:
     void GrabObject(int depth, int width);
     void PlaceObject(int placeDepth, int placeWidth);
     void ObjectMove();
-    void DebugImgui();
+    void HoldNewObject(const int& stageDetaNum);
 
 private:
     XMFLOAT3 m_worldPosition;

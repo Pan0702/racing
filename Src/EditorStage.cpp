@@ -75,7 +75,7 @@ void CEditorStage::CheckData()
 //一桁目:タイル情報
 //１，まっすぐな道、２．カーブ、３．ゴールライン
 //二桁目:角度情報
-//０．０度、１．９０度、２．１８０度、３．２７０度
+//1．０度、１．９０度、２．１８０度、３．２７０度
 //三桁目以降:高さ情報
 void CEditorStage::ProcessStageData(const int x, const int z, int stageData)
 {
@@ -117,6 +117,7 @@ void CEditorStage::MeshRender(const int meshNum)
         loadGoalMesh->Render(transform.matrix());
         break;
     default:
-        assert(false);
+        //assert(false);
+        return;
     }
 }

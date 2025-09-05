@@ -31,7 +31,7 @@ CEditorObjectMove::~CEditorObjectMove()
 // 毎フレーム呼ばれる更新処理
 void CEditorObjectMove::Update()
 {
-    m_worldPosition = ObjectManager::FindGameObject<EditorChangeWorldCoordinate>()->ReterndWorldPosition();
+    m_worldPosition = ObjectManager::FindGameObject<CEditorChangeWorldCoordinate>()->ReterndWorldPosition();
 
 }
 
@@ -121,6 +121,17 @@ void CEditorObjectMove::ObjectMove()
     {
         m_pStage->ProcessStageData(m_worldPosition.x, m_worldPosition.z, m_tmpStageData);
     }
+}
+
+void CEditorObjectMove::HoldNewObject(const int& stageDetaNum)
+{
+    if (holdObject)
+    {
+        m_pStageData->stageData[m_tmpDepth][m_tmpWidth] = m_tmpStageData;
+        
+    }
+    m_tmpStageData = stageDetaNum;
+    holdObject = true;
 }
 
 

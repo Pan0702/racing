@@ -36,16 +36,17 @@ public:
     void DebugImgui();
 
 private:
+    enum ButtonState
+    {
+        state_straight = 1,
+        state_curve,
+        state_GoalLine
+    };
     XMFLOAT3 m_worldPosition;
     CEditorStageData* m_pStageData;
     CEditorStage* m_pStage;
 
     // 複数ボタン管理用
     std::vector<ImageButtonData> m_imageButtons;
-
-    bool holdObject;
-    int m_tmpStageData;
-    int m_tmpWidth;
-    int m_tmpDepth;
-    int m_mouseLeftCount;
+    
 };

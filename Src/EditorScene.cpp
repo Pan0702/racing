@@ -7,6 +7,7 @@
 #include "EditorStageData.h"
 #include "EditorChangeWorldCoordinate.h"
 
+
 CEditorScene::CEditorScene()
 {
     m_depthBlockNum = 1;
@@ -19,6 +20,7 @@ CEditorScene::CEditorScene()
     new CEditorObjectMove();
     new CEditorChangeWorldCoordinate();
     new CEditorButtonManager();
+   
 
     m_pStageData = ObjectManager::FindGameObject<CEditorStageData>();
 }
@@ -44,6 +46,8 @@ void CEditorScene::Update()
         m_prevWidthBlockNum = m_widthBlockNum;
     }
     ImGui::End();
+   // ImGui::ShowDemoWindow();
+
 }
 
 void CEditorScene::Draw()

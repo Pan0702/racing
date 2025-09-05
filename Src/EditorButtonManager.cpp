@@ -1,5 +1,5 @@
 #include "EditorButtonManager.h"
-
+#include "EditorObjectMove.h"
 #include "EditorStage.h"
 #include "EditorStageData.h"
 
@@ -8,8 +8,6 @@ CEditorButtonManager::CEditorButtonManager()
     m_worldPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
     m_pStageData = ObjectManager::FindGameObject<CEditorStageData>();
     m_pStage = ObjectManager::FindGameObject<CEditorStage>();
-    holdObject = false;
-    m_mouseLeftCount = 0;
     
     // ボタンの初期化
     InitializeButtons();
@@ -29,9 +27,9 @@ void CEditorButtonManager::Update()
 void CEditorButtonManager::InitializeButtons()
 {
     // ボタンを追加（ID, テクスチャパス, サイズ）
-    m_imageButtons.emplace_back("object1", "data/images/Plane.jpg", ImVec2(64, 64));
-    m_imageButtons.emplace_back("object2", "data/images/Curve.jpg", ImVec2(64, 64));
-    m_imageButtons.emplace_back("object3", "data/images/GoalLine.jpg", ImVec2(64, 64));
+    m_imageButtons.emplace_back("straight", "data/images/Plane.png", ImVec2(64, 64));
+    m_imageButtons.emplace_back("curve", "data/images/Curve.png", ImVec2(64, 64));
+    m_imageButtons.emplace_back("goalline", "data/images/GoalLine.png", ImVec2(64, 64));
     m_imageButtons.emplace_back("delete", "Data/delete.png", ImVec2(48, 48));
     m_imageButtons.emplace_back("save", "Data/save.png", ImVec2(48, 48));
     
@@ -57,13 +55,22 @@ bool CEditorButtonManager::LoadButtonTexture(ImageButtonData& buttonData)
     if (SUCCEEDED(hr))
     {
         buttonData.isLoaded = true;
+        // デバッグ用：読み込み成功のログを出力
+        OutputDebugString("テクスチャ読み込み成功: ");
+        OutputDebugStringA(buttonData.texturePath.c_str());
+        OutputDebugString("\n");
         return true;
     }
     else
     {
         buttonData.isLoaded = false;
+        // デバッグ用：読み込み失敗のログを出力
+        OutputDebugString("テクスチャ読み込み失敗: ");
+        OutputDebugStringA(buttonData.texturePath.c_str());
+        OutputDebugString("\n");
         return false;
     }
+
 }
 
 // 全テクスチャの解放
@@ -91,6 +98,7 @@ void CEditorButtonManager::CreateImageButton(const ImageButtonData& buttonData)
         {
             HandleButtonClick(buttonData.buttonID);
         }
+        ImGui::PopID();
     }
     else
     {
@@ -105,18 +113,18 @@ void CEditorButtonManager::CreateImageButton(const ImageButtonData& buttonData)
 // ボタンクリック時の処理
 void CEditorButtonManager::HandleButtonClick(const std::string& buttonID)
 {
-    if (buttonID == "object1")
+    CEditorObjectMove* pObjectMove = ObjectManager::FindGameObject<CEditorObjectMove>();
+    if (buttonID == "straight")
     {
-        // オブジェクト1を配置するモードに切り替え
-        // 例：選択中のオブジェクトタイプを変更
+        pObjectMove->HoldNewObject(ButtonState::state_straight);
     }
-    else if (buttonID == "object2")
+    else if (buttonID == "curve")
     {
-        // オブジェクト2を配置するモードに切り替え
+        pObjectMove->HoldNewObject(ButtonState::state_curve);
     }
-    else if (buttonID == "object3")
+    else if (buttonID == "goalline")
     {
-        // オブジェクト3を配置するモードに切り替え
+        pObjectMove->HoldNewObject(ButtonState::state_GoalLine);
     }
     else if (buttonID == "delete")
     {
@@ -125,8 +133,10 @@ void CEditorButtonManager::HandleButtonClick(const std::string& buttonID)
     else if (buttonID == "save")
     {
         // ステージデータを保存
+    }else
+    {
+        assert("不正なID");
     }
-    assert("不正なID");
 }
 
 // ImGuiでの表示
@@ -151,18 +161,6 @@ void CEditorButtonManager::DebugImgui()
     ImGui::EndGroup();
     
     ImGui::Separator();
-    
-    // ツールボタン
-    ImGui::Text("ツール");
-    ImGui::BeginGroup();
-    {
-        for (size_t i = 3; i < m_imageButtons.size(); i++)
-        {
-            CreateImageButton(m_imageButtons[i]);
-            if (i < m_imageButtons.size() - 1) ImGui::SameLine();
-        }
-    }
-    ImGui::EndGroup();
     
     ImGui::End();
 }
