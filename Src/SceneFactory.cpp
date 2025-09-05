@@ -27,7 +27,7 @@ SceneBase * SceneFactory::Create(const std::string & name)
 	}
 	if (name == "MapEditor")
 	{
-		return new EditorScene();
+		return new CEditorScene();
 	}
 	assert(false);
 	return nullptr;
