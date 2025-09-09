@@ -11,17 +11,8 @@ public:
     ~CEditorScene();
     void Update()override;
     void Draw()override;
-    
 
 private:
-    void DrawLine(const VECTOR3& start, const VECTOR3& end, const DWORD& color);
-    void MapSizeChanged();
-    int m_depthBlockNum;
-    int m_widthBlockNum;
 
-    int m_prevDepthBlockNum;
-    int m_prevWidthBlockNum;
-    VECTOR3 m_lineStartPos;
-    CEditorStageData* m_pStageData;
     
 };

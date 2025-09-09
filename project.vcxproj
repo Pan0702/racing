@@ -525,6 +525,9 @@
     <ClInclude Include="Src\Coin.h" />
     <ClInclude Include="Src\Collision.h" />
     <ClInclude Include="Src\CsvReader.h" />
+    <ClInclude Include="Src\EditorDrawBorderLine.h" />
+    <ClInclude Include="Src\EditorButtonManager.h" />
+    <ClInclude Include="Src\EditorChangeWorldCoordinate.h" />
     <ClInclude Include="Src\EditorObjectMove.h" />
     <ClInclude Include="Src\EditorStageData.h" />
     <ClInclude Include="Src\DInput.h" />
@@ -572,6 +575,9 @@
     <ClCompile Include="Src\Coin.cpp" />
     <ClCompile Include="Src\Collision.cpp" />
     <ClCompile Include="Src\CsvReader.cpp" />
+    <ClCompile Include="Src\EditorDrawBorderLine.cpp" />
+    <ClCompile Include="Src\EditorButtonManager.cpp" />
+    <ClCompile Include="Src\EditorChangeWorldCoordinate.cpp" />
     <ClCompile Include="Src\EditorObjectMove.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -758,6 +764,73 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Src\Main.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="data\Ghost\Blinky.fbx" />
+    <Content Include="data\Ghost\Clyde.fbx" />
+    <Content Include="data\Ghost\ColorMap.png" />
+    <Content Include="data\Ghost\Ghost.fbx" />
+    <Content Include="data\Ghost\Ghost.mesh" />
+    <Content Include="data\Ghost\Inty.fbx" />
+    <Content Include="data\Ghost\Log.txt" />
+    <Content Include="data\Ghost\PacMan.anmx" />
+    <Content Include="data\Ghost\PacMan.fbx" />
+    <Content Include="data\Ghost\PacMan.mesh" />
+    <Content Include="data\Ghost\Pinky.fbx" />
+    <Content Include="data\images\clear.png" />
+    <Content Include="data\images\go.png" />
+    <Content Include="data\images\miss.png" />
+    <Content Include="data\images\number.png" />
+    <Content Include="data\images\ready.png" />
+    <Content Include="data\images\timeup.png" />
+    <Content Include="data\images\title.png" />
+    <Content Include="data\LowPoly\boxA.png" />
+    <Content Include="data\LowPoly\boxWooden.fbx" />
+    <Content Include="data\LowPoly\char01.fbx" />
+    <Content Include="data\LowPoly\char01.png" />
+    <Content Include="data\LowPoly\char02.fbx" />
+    <Content Include="data\LowPoly\char02.png" />
+    <Content Include="data\LowPoly\char03.fbx" />
+    <Content Include="data\LowPoly\char03.png" />
+    <Content Include="data\LowPoly\char04.fbx" />
+    <Content Include="data\LowPoly\char04.png" />
+    <Content Include="data\LowPoly\coin.fbx" />
+    <Content Include="data\LowPoly\coin.mesh" />
+    <Content Include="data\LowPoly\heart.fbx" />
+    <Content Include="data\LowPoly\key.fbx" />
+    <Content Include="data\LowPoly\lockA.png" />
+    <Content Include="data\LowPoly\Log.txt" />
+    <Content Include="data\LowPoly\pipe.fbx" />
+    <Content Include="data\LowPoly\props_base_color.png" />
+    <Content Include="data\LowPoly\WallStone.mesh" />
+    <Content Include="data\LowPoly\wallStone01.fbx" />
+    <Content Include="data\LowPoly\wallStoneB.png" />
+    <Content Include="data\mesh\colormap.png" />
+    <Content Include="data\mesh\load-Brige.mesh" />
+    <Content Include="data\mesh\load-Curve-Big.mesh" />
+    <Content Include="data\mesh\load-curve.mesh" />
+    <Content Include="data\mesh\load-Plane-GoalLIne.mesh" />
+    <Content Include="data\mesh\load-Plane-half.mesh" />
+    <Content Include="data\mesh\load-Plane-Slop.mesh" />
+    <Content Include="data\mesh\load-Plane.mesh" />
+    <Content Include="data\Mousey\Anim_Dance.anmx" />
+    <Content Include="data\Mousey\Anim_Idle.anmx" />
+    <Content Include="data\Mousey\Anim_Run.anmx" />
+    <Content Include="data\Mousey\Breathing.fbx" />
+    <Content Include="data\Mousey\Ch14_1001_Diffuse.png" />
+    <Content Include="data\Mousey\Ch14_1001_Glossiness.png" />
+    <Content Include="data\Mousey\Ch14_1001_Normal.png" />
+    <Content Include="data\Mousey\Ch14_1001_Specular.png" />
+    <Content Include="data\Mousey\Dancing.fbx" />
+    <Content Include="data\Mousey\Log.txt" />
+    <Content Include="data\Mousey\Mousey.mesh" />
+    <Content Include="data\Mousey\Running.fbx" />
+    <Content Include="data\sounds\bgm.mp3" />
+    <Content Include="data\sounds\clear.mp3" />
+    <Content Include="data\sounds\getCoin.mp3" />
+    <Content Include="data\sounds\go.mp3" />
+    <Content Include="data\sounds\ready.mp3" />
+    <Content Include="data\sounds\timeup.mp3" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

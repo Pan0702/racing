@@ -65,7 +65,7 @@ void CEditorStage::CheckData()
     {
         for (int x = 0; x < m_widthSize; x++)
         {
-            int tmpStageData = m_pStageData->ReturnData(z, x);
+            int tmpStageData = m_pStageData->GetData(z, x);
             //ステージデータが空の場合
             if (tmpStageData == 0) continue;
                 ProcessStageData(x * 10, z * 10, tmpStageData);

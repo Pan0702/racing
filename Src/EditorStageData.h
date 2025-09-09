@@ -4,8 +4,9 @@
 class CEditorStageData:public Object3D
 {
 public:
-    CEditorStageData(const int& X, const int& Y);
-    
+    CEditorStageData();
+    void Update() override;
+    int GetData(const int x, const int y) const;
     //一桁目マップチップの種類
     //１，まっすぐな道、２．カーブ、３．ゴールライン
     //二桁目チップの回転
@@ -13,6 +14,13 @@ public:
     //三桁目以降マップチップの高さ
     //がint型で保存されている
     std::vector<std::vector<int>> stageData;
-    void InitStageData(const int& X, const int& Y);
-    int ReturnData(const int x, const int y) const;
+    std::vector<std::vector<std::vector<int>>> stageData2;
+    
+private:
+    void DrawMapSizeEditor();
+    void InitStageData(const int& X, const int& z);
+    
+    int m_depthBlockNum;
+    int m_widthBlockNum;
+    int m_layerNum;
 };

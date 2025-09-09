@@ -18,7 +18,7 @@ CEditorObjectMove::CEditorObjectMove()
     
     m_pStageData = ObjectManager::FindGameObject<CEditorStageData>();
     m_pStage = ObjectManager::FindGameObject<CEditorStage>();
-    holdObject = false;
+    isHoldObject = false;
     
 }
 
@@ -67,11 +67,11 @@ bool CEditorObjectMove::IsValidGridPosition(int depth, int width)
 // オブジェクトを掴む処理
 void CEditorObjectMove::GrabObject(int depth, int width)
 {
-    m_tmpStageData = m_pStageData->ReturnData(depth, width);
+    m_tmpStageData = m_pStageData->GetData(depth, width);
     m_pStageData->stageData[depth][width] = EMPTY_CELL;
     m_tmpDepth = depth;
     m_tmpWidth = width;
-    holdObject = true;
+    isHoldObject = true;
 }
 
 // オブジェクトを配置する処理
@@ -79,7 +79,7 @@ void CEditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
 {
     if (IsValidGridPosition(placeDepth, placeWidth))
     {
-        if (m_pStageData->stageData[placeDepth][placeWidth] == EMPTY_CELL)
+        if (m_pStageData->GetData(placeDepth, placeWidth) == EMPTY_CELL)
         {
                 m_pStageData->stageData[placeDepth][placeWidth] = m_tmpStageData;
         }
@@ -89,7 +89,7 @@ void CEditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
         // 配置位置が無効な場合は元の位置に戻す
         m_pStageData->stageData[m_tmpDepth][m_tmpWidth] = m_tmpStageData;
     }
-    holdObject = false;
+    isHoldObject = false;
 }
 
 // オブジェクトの移動処理（メイン処理）
@@ -101,11 +101,11 @@ void CEditorObjectMove::ObjectMove()
     {
         int width = CalculateGridPosition(m_worldPosition.x);
         int depth = CalculateGridPosition(m_worldPosition.z);
-        if (!holdObject)
+        if (!isHoldObject)
         {
             // オブジェクトを持っていない場合：つかむ処理
             if (!IsValidGridPosition(depth, width)) return;
-            if (m_pStageData->stageData[depth][width] == EMPTY_CELL) return;
+            if (m_pStageData->GetData(depth,width) == EMPTY_CELL) return;
             
             GrabObject(depth, width);
         }
@@ -117,7 +117,7 @@ void CEditorObjectMove::ObjectMove()
     }
     
     // オブジェクトを持っている間は、常にマウス位置に表示
-    if (holdObject)
+    if (isHoldObject)
     {
         m_pStage->ProcessStageData(m_worldPosition.x, m_worldPosition.z, m_tmpStageData);
     }
@@ -125,13 +125,13 @@ void CEditorObjectMove::ObjectMove()
 
 void CEditorObjectMove::HoldNewObject(const int& stageDetaNum)
 {
-    if (holdObject)
+    if (isHoldObject)
     {
         m_pStageData->stageData[m_tmpDepth][m_tmpWidth] = m_tmpStageData;
         
     }
     m_tmpStageData = stageDetaNum;
-    holdObject = true;
+    isHoldObject = true;
 }
 
 
