@@ -1,5 +1,8 @@
 #include "EditorScene.h"
 
+#include <iostream>
+#include <ostream>
+
 #include "EditorDrawBorderLine.h"
 #include "EditorButtonManager.h"
 #include "EditorCamera.h"

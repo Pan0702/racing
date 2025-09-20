@@ -2,9 +2,9 @@
 
 namespace
 {
-    static constexpr int HEIGHT_DIVISOR = 100;
-    static constexpr int ANGLE_DIVISOR = 10;
-    static constexpr int TYPE_MODULO = 10;
+    constexpr int HEIGHT_DIVISOR = 100;
+    constexpr int ANGLE_DIVISOR = 10;
+    constexpr int TYPE_MODULO = 10;
 }
 
 CEditorStage::CEditorStage()
@@ -87,8 +87,8 @@ void CEditorStage::ProcessStageData(const int x, const int z, int stageData)
     MeshPosSet(x, height, z);
 
     // 角度情報（2桁目）
-    int angleIndex = (stageData % HEIGHT_DIVISOR) / ANGLE_DIVISOR;
-    MeshDegSet(angleIndex * 90); // 0, 90, 180, 270度
+    const int angleIndex = (stageData % HEIGHT_DIVISOR) / ANGLE_DIVISOR;
+    MeshDegSet(angleIndex); // 0, 90, 180, 270度
 
     // タイル種類（1桁目）
     const int meshType = stageData % TYPE_MODULO;
@@ -97,12 +97,12 @@ void CEditorStage::ProcessStageData(const int x, const int z, int stageData)
 
 void CEditorStage::MeshPosSet(const int width, const int height, const int depth)
 {
-    transform.position = VECTOR3(width, height, depth);
+    transform.position = VECTOR3(width, height, depth);  // NOLINT(bugprone-narrowing-conversions)
 }
 
-void CEditorStage::MeshDegSet(const int degNum)
+void CEditorStage::MeshDegSet(const float& degNum)
 {
-    transform.rotation.y = (degNum * 90) * DegToRad;
+    transform.rotation.y = DegToRad * (degNum * 90);
 }
 
 void CEditorStage::MeshRender(const int meshNum)
@@ -119,7 +119,7 @@ void CEditorStage::MeshRender(const int meshNum)
         loadGoalMesh->Render(transform.matrix());
         break;
     default:
-        //assert(false);
-        return;
+        assert(false);
+        break;
     }
 }

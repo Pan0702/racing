@@ -20,7 +20,7 @@ private:
 
     void GetStageSize();
     void MeshPosSet(const int width, const int height, const int depth);
-    void MeshDegSet(const int degNum);
+    void MeshDegSet(const float& degNum);
     void MeshRender(const int meshNum);
 
     enum MeshType

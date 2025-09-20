@@ -13,10 +13,10 @@ public:
 
 private:
     ~CEditorObjectMove();
-    int CheckMousePos(int mousePos);
-    int CalculateGridPosition(float worldPos);
-    void GrabObject(int depth, int width);
-    void PlaceObject(int placeDepth, int placeWidth);
+    int CheckMousePos(const int& mousePos);
+    int CalculateGridPosition(const float& worldPos);
+    void GrabObject(const int& depth, const int& width);
+    void PlaceObject(const int& placeDepth, const int& placeWidth);
     void ObjectMove();
     void RotateYObject();
     void Clamp();

@@ -7,9 +7,9 @@
 namespace
 {
     // 定数定義
-    static constexpr int GRID_SIZE = 10;
-    static constexpr int SNAP_THRESHOLD = 5;
-    static constexpr int EMPTY_CELL = 0;
+     constexpr int GRID_SIZE = 10;
+     constexpr int SNAP_THRESHOLD = 5;
+     constexpr int EMPTY_CELL = 0;
 }
 
 // コンストラクタ - 初期化処理
@@ -29,6 +29,7 @@ CEditorObjectMove::~CEditorObjectMove()
 void CEditorObjectMove::Update()
 {
     m_worldPosition = ObjectManager::FindGameObject<CEditorChangeWorldCoordinate>()->ReterndWorldPosition();
+    RotateYObject();
 }
 
 // 描画処理
@@ -39,7 +40,7 @@ void CEditorObjectMove::Draw()
 
 
 // マウス位置のグリッドスナップ処理
-int CEditorObjectMove::CheckMousePos(int mousePos)
+int CEditorObjectMove::CheckMousePos(const int& mousePos)
 {
     int tmp = mousePos % GRID_SIZE;
     if (tmp < SNAP_THRESHOLD) return 0;
@@ -47,13 +48,13 @@ int CEditorObjectMove::CheckMousePos(int mousePos)
 }
 
 // ワールド座標からグリッド座標への変換
-int CEditorObjectMove::CalculateGridPosition(float worldPos)
+int CEditorObjectMove::CalculateGridPosition(const float& worldPos)
 {
-    return (((int)worldPos / GRID_SIZE) * GRID_SIZE + CheckMousePos(worldPos)) / GRID_SIZE;
+    return ((static_cast<int>(worldPos) / GRID_SIZE) * GRID_SIZE + CheckMousePos(worldPos)) / GRID_SIZE;
 }
 
 // オブジェクトを掴む処理
-void CEditorObjectMove::GrabObject(int depth, int width)
+void CEditorObjectMove::GrabObject(const int& depth, const int& width)
 {
     m_tmpStageData = m_pStageData->GetData(depth, width);
     m_pStageData->stageData[depth][width] = EMPTY_CELL;
@@ -63,19 +64,19 @@ void CEditorObjectMove::GrabObject(int depth, int width)
 }
 
 // オブジェクトを配置する処理
-void CEditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
+void CEditorObjectMove::PlaceObject(const int& placeDepth, const int& placeWidth)
 {
     if (m_pStageData->IsValidGridPosition(placeDepth, placeWidth))
     {
         if (m_pStageData->GetData(placeDepth, placeWidth) == EMPTY_CELL)
         {
-            m_pStageData->stageData[placeDepth][placeWidth] = m_tmpStageData;
+            m_pStageData->SetData(placeDepth, placeWidth,m_tmpStageData);
         }
     }
     else
     {
         // 配置位置が無効な場合は元の位置に戻す
-        m_pStageData->stageData[m_tmpDepth][m_tmpWidth] = m_tmpStageData;
+        m_pStageData->SetData(m_tmpDepth, m_tmpWidth,m_tmpStageData);
     }
     isHoldObject = false;
 }
@@ -126,18 +127,19 @@ void CEditorObjectMove::RotateYObject()
 void CEditorObjectMove::Clamp()
 {
     //4以降は角度が0になるから
-    if (m_tmpStageData / 10 > 3)
+    if ((m_tmpStageData / 10)> 3)
     {
-        m_tmpStageData = m_tmpStageData % 10;
+        m_tmpStageData = m_tmpStageData - 40;
     }
+    
 }
 
 void CEditorObjectMove::HoldNewObject(const int& stageDetaNum)
 {
     if (isHoldObject)
     {
-        m_pStageData->stageData[m_tmpDepth][m_tmpWidth] = m_tmpStageData;
-    }
+        m_pStageData->SetData(m_tmpDepth, m_tmpWidth,m_tmpStageData);
+   }
     m_tmpStageData = stageDetaNum;
     isHoldObject = true;
 }
