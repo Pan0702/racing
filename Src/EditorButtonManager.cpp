@@ -8,7 +8,7 @@ CEditorButtonManager::CEditorButtonManager()
     m_worldPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
     m_pStageData = ObjectManager::FindGameObject<CEditorStageData>();
     m_pStage = ObjectManager::FindGameObject<CEditorStage>();
-    
+
     // ボタンの初期化
     InitializeButtons();
 }
@@ -32,7 +32,7 @@ void CEditorButtonManager::InitializeButtons()
     m_imageButtons.emplace_back("goalline", "data/images/GoalLine.png", ImVec2(64, 64));
     m_imageButtons.emplace_back("delete", "Data/delete.png", ImVec2(48, 48));
     m_imageButtons.emplace_back("save", "Data/save.png", ImVec2(48, 48));
-    
+
     // 全てのテクスチャを読み込み
     for (auto& button : m_imageButtons)
     {
@@ -44,14 +44,14 @@ void CEditorButtonManager::InitializeButtons()
 bool CEditorButtonManager::LoadButtonTexture(ImageButtonData& buttonData)
 {
     DWORD imageWidth, imageHeight;
-    
+
     HRESULT hr = GameDevice()->m_pD3D->CreateShaderResourceViewFromFile(
         _T(buttonData.texturePath.c_str()),
         &buttonData.pTexture,
         imageWidth,
         imageHeight
     );
-    
+
     if (SUCCEEDED(hr))
     {
         buttonData.isLoaded = true;
@@ -70,7 +70,6 @@ bool CEditorButtonManager::LoadButtonTexture(ImageButtonData& buttonData)
         OutputDebugString("\n");
         return false;
     }
-
 }
 
 // 全テクスチャの解放
@@ -94,7 +93,7 @@ void CEditorButtonManager::CreateImageButton(const ImageButtonData& buttonData)
     {
         ImGui::PushID(buttonData.buttonID.c_str());
         if (ImGui::ImageButton((ImTextureID)buttonData.pTexture,
-                              buttonData.size))
+                               buttonData.size))
         {
             HandleButtonClick(buttonData.buttonID);
         }
@@ -133,7 +132,8 @@ void CEditorButtonManager::HandleButtonClick(const std::string& buttonID)
     else if (buttonID == "save")
     {
         // ステージデータを保存
-    }else
+    }
+    else
     {
         assert("不正なID");
     }
@@ -144,9 +144,9 @@ void CEditorButtonManager::DebugImgui()
 {
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 10), ImGuiCond_FirstUseEver);
     ImGui::Begin("エディタツール");
-    
+
     ImGui::Separator();
-    
+
     // オブジェクト配置ボタン
     ImGui::Text("オブジェクト配置");
     ImGui::BeginGroup();
@@ -159,8 +159,8 @@ void CEditorButtonManager::DebugImgui()
         }
     }
     ImGui::EndGroup();
-    
+
     ImGui::Separator();
-    
+
     ImGui::End();
 }

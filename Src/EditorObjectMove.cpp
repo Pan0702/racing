@@ -1,6 +1,6 @@
 #include "EditorObjectMove.h"
 #include <cmath>
-
+#include "algorithm"
 #include "EditorCamera.h"
 #include "EditorChangeWorldCoordinate.h"
 
@@ -15,24 +15,20 @@ namespace
 // コンストラクタ - 初期化処理
 CEditorObjectMove::CEditorObjectMove()
 {
-    
     m_pStageData = ObjectManager::FindGameObject<CEditorStageData>();
     m_pStage = ObjectManager::FindGameObject<CEditorStage>();
     isHoldObject = false;
-    
 }
 
 // デストラクタ
 CEditorObjectMove::~CEditorObjectMove()
 {
-
 }
 
 // 毎フレーム呼ばれる更新処理
 void CEditorObjectMove::Update()
 {
     m_worldPosition = ObjectManager::FindGameObject<CEditorChangeWorldCoordinate>()->ReterndWorldPosition();
-
 }
 
 // 描画処理
@@ -56,14 +52,6 @@ int CEditorObjectMove::CalculateGridPosition(float worldPos)
     return (((int)worldPos / GRID_SIZE) * GRID_SIZE + CheckMousePos(worldPos)) / GRID_SIZE;
 }
 
-// グリッド位置が有効範囲内かチェック
-bool CEditorObjectMove::IsValidGridPosition(int depth, int width)
-{
-    return (depth >= 0 && width >= 0 && 
-            depth < m_pStageData->stageData.size() && 
-            width < m_pStageData->stageData[0].size());
-}
-
 // オブジェクトを掴む処理
 void CEditorObjectMove::GrabObject(int depth, int width)
 {
@@ -77,11 +65,11 @@ void CEditorObjectMove::GrabObject(int depth, int width)
 // オブジェクトを配置する処理
 void CEditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
 {
-    if (IsValidGridPosition(placeDepth, placeWidth))
+    if (m_pStageData->IsValidGridPosition(placeDepth, placeWidth))
     {
         if (m_pStageData->GetData(placeDepth, placeWidth) == EMPTY_CELL)
         {
-                m_pStageData->stageData[placeDepth][placeWidth] = m_tmpStageData;
+            m_pStageData->stageData[placeDepth][placeWidth] = m_tmpStageData;
         }
     }
     else
@@ -95,7 +83,6 @@ void CEditorObjectMove::PlaceObject(int placeDepth, int placeWidth)
 // オブジェクトの移動処理（メイン処理）
 void CEditorObjectMove::ObjectMove()
 {
-    
     // 左クリックした瞬間にオブジェクトを掴む
     if (GameDevice()->m_pDI->CheckMouse(KD_TRG, DIM_LBUTTON))
     {
@@ -104,9 +91,9 @@ void CEditorObjectMove::ObjectMove()
         if (!isHoldObject)
         {
             // オブジェクトを持っていない場合：つかむ処理
-            if (!IsValidGridPosition(depth, width)) return;
-            if (m_pStageData->GetData(depth,width) == EMPTY_CELL) return;
-            
+            if (!m_pStageData->IsValidGridPosition(depth, width)) return;
+            if (m_pStageData->GetData(depth, width) == EMPTY_CELL) return;
+
             GrabObject(depth, width);
         }
         else
@@ -115,11 +102,33 @@ void CEditorObjectMove::ObjectMove()
             PlaceObject(depth, width);
         }
     }
-    
+
     // オブジェクトを持っている間は、常にマウス位置に表示
     if (isHoldObject)
     {
-        m_pStage->ProcessStageData(m_worldPosition.x, m_worldPosition.z, m_tmpStageData);
+        m_pStage->ProcessStageData
+        (static_cast<int>(m_worldPosition.x),
+         static_cast<int>(m_worldPosition.z),
+         m_tmpStageData);
+    }
+}
+
+void CEditorObjectMove::RotateYObject()
+{
+    if (!isHoldObject)return;
+    if (GameDevice()->m_pDI->CheckMouse(KD_TRG, DIM_RBUTTON))
+    {
+        m_tmpStageData += 10;
+        Clamp();
+    }
+}
+
+void CEditorObjectMove::Clamp()
+{
+    //4以降は角度が0になるから
+    if (m_tmpStageData / 10 > 3)
+    {
+        m_tmpStageData = m_tmpStageData % 10;
     }
 }
 
@@ -128,10 +137,7 @@ void CEditorObjectMove::HoldNewObject(const int& stageDetaNum)
     if (isHoldObject)
     {
         m_pStageData->stageData[m_tmpDepth][m_tmpWidth] = m_tmpStageData;
-        
     }
     m_tmpStageData = stageDetaNum;
     isHoldObject = true;
 }
-
-

@@ -2,9 +2,9 @@
 
 #include "EditorStageData.h"
 
-CEditorDrawBorderLine::CEditorDrawBorderLine() 
+CEditorDrawBorderLine::CEditorDrawBorderLine()
 {
-     m_lineStartPos = VECTOR3(-5, 0, 5);
+    m_lineStartPos = VECTOR3(-5, 0, 5);
     m_pStage = ObjectManager::FindGameObject<CEditorStageData>();
 }
 
@@ -24,7 +24,7 @@ void CEditorDrawBorderLine::Draw()
     //DrawLine(VECTOR3(0, 0, 0), VECTOR3(0, 0, m_depthBlockNum), RGB(0, 0, 0));
     for (int i = 0; i <= m_x; i++)
     {
-        DrawLine(VECTOR3(i * 10,0,-10), VECTOR3(i * 10, 0, m_z * 10 - 10), RGB(255,255,255));
+        DrawLine(VECTOR3(i * 10, 0, -10), VECTOR3(i * 10, 0, m_z * 10 - 10), RGB(255, 255, 255));
     }
     for (int i = -1; i < m_z; i++)
     {
@@ -32,9 +32,8 @@ void CEditorDrawBorderLine::Draw()
     }
 }
 
-void CEditorDrawBorderLine::DrawLine(const VECTOR3& start , const VECTOR3& end, const DWORD& color)
+void CEditorDrawBorderLine::DrawLine(const VECTOR3& start, const VECTOR3& end, const DWORD& color)
 {
     CSprite sprite;
     sprite.DrawLine3D(start + m_lineStartPos, end + m_lineStartPos, color);
 }
-

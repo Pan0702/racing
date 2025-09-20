@@ -1,13 +1,13 @@
 #pragma once
 #include "Object3D.h"
 
-class CEditorCamera:public Object3D
+class CEditorCamera : public Object3D
 {
 public:
     CEditorCamera();
     ~CEditorCamera();
-    void Update()override;
-    void ViewMatrixUpdate(); 
+    void Update() override;
+    void ViewMatrixUpdate();
     float MouseMove(const int& oldCoordinates, const int& nowCoordinates);
 
 private:
@@ -15,5 +15,4 @@ private:
     int m_prevMouseX;
     int m_prevMouseY;
     bool m_isMiddleButtonPressed;
-
 };
