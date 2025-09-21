@@ -53,34 +53,6 @@ int CEditorObjectMove::CalculateGridPosition(const float& worldPos)
     return ((static_cast<int>(worldPos) / GRID_SIZE) * GRID_SIZE + CheckMousePos(worldPos)) / GRID_SIZE;
 }
 
-// オブジェクトを掴む処理
-void CEditorObjectMove::GrabObject(const int& depth, const int& width)
-{
-    m_tmpStageData = m_pStageData->GetData(depth, width);
-    m_pStageData->stageData[depth][width] = EMPTY_CELL;
-    m_tmpDepth = depth;
-    m_tmpWidth = width;
-    isHoldObject = true;
-}
-
-// オブジェクトを配置する処理
-void CEditorObjectMove::PlaceObject(const int& placeDepth, const int& placeWidth)
-{
-    if (m_pStageData->IsValidGridPosition(placeDepth, placeWidth))
-    {
-        if (m_pStageData->GetData(placeDepth, placeWidth) == EMPTY_CELL)
-        {
-            m_pStageData->SetData(placeDepth, placeWidth,m_tmpStageData);
-        }
-    }
-    else
-    {
-        // 配置位置が無効な場合は元の位置に戻す
-        m_pStageData->SetData(m_tmpDepth, m_tmpWidth,m_tmpStageData);
-    }
-    isHoldObject = false;
-}
-
 // オブジェクトの移動処理（メイン処理）
 void CEditorObjectMove::ObjectMove()
 {
@@ -92,8 +64,8 @@ void CEditorObjectMove::ObjectMove()
         if (!isHoldObject)
         {
             // オブジェクトを持っていない場合：つかむ処理
-            if (!m_pStageData->IsValidGridPosition(depth, width)) return;
-            if (m_pStageData->GetData(depth, width) == EMPTY_CELL) return;
+            if (!m_pStageData->IsValidGridPosition(width, depth)) return;
+            if (m_pStageData->GetData(width, depth) == EMPTY_CELL) return;
 
             GrabObject(depth, width);
         }
@@ -112,6 +84,34 @@ void CEditorObjectMove::ObjectMove()
          static_cast<int>(m_worldPosition.z),
          m_tmpStageData);
     }
+}
+
+// オブジェクトを掴む処理
+void CEditorObjectMove::GrabObject(const int& depth, const int& width)
+{
+    m_tmpStageData = m_pStageData->GetData(width, depth);
+    m_pStageData->SetData(width,depth,EMPTY_CELL);
+    m_tmpDepth = depth;
+    m_tmpWidth = width;
+    isHoldObject = true;
+}
+
+// オブジェクトを配置する処理
+void CEditorObjectMove::PlaceObject(const int& placeDepth, const int& placeWidth)
+{
+    if (m_pStageData->IsValidGridPosition(placeWidth, placeDepth))
+    {
+        if (m_pStageData->GetData(placeWidth, placeDepth) == EMPTY_CELL)
+        {
+            m_pStageData->SetData(placeWidth, placeDepth,m_tmpStageData);
+        }
+    }
+    else
+    {
+        // 配置位置が無効な場合は元の位置に戻す
+        m_pStageData->SetData(m_tmpWidth, m_tmpDepth,m_tmpStageData);
+    }
+    isHoldObject = false;
 }
 
 void CEditorObjectMove::RotateYObject()
@@ -138,7 +138,7 @@ void CEditorObjectMove::HoldNewObject(const int& stageDetaNum)
 {
     if (isHoldObject)
     {
-        m_pStageData->SetData(m_tmpDepth, m_tmpWidth,m_tmpStageData);
+        m_pStageData->SetData(m_tmpWidth, m_tmpDepth,m_tmpStageData);
    }
     m_tmpStageData = stageDetaNum;
     isHoldObject = true;

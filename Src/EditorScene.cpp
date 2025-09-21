@@ -23,8 +23,6 @@ CEditorScene::CEditorScene()
     new CEditorObjectMove();
     new CEditorChangeWorldCoordinate();
     new CEditorButtonManager();
-   
-    
 }
 
 CEditorScene::~CEditorScene()

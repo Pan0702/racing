@@ -15,8 +15,8 @@ CEditorDrawBorderLine::~CEditorDrawBorderLine()
 
 void CEditorDrawBorderLine::Update()
 {
-    m_x = m_pStage->stageData.size();
-    m_z = m_pStage->stageData[0].size();
+    m_x = m_pStage->GetDepthSize();
+    m_z = m_pStage->GetWidthSize();
 }
 
 void CEditorDrawBorderLine::Draw()

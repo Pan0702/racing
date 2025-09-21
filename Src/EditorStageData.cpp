@@ -10,6 +10,7 @@ CEditorStageData::CEditorStageData()
     m_depthBlockNum = 1;
     m_widthBlockNum = 1;
     m_layerNum = 1;
+    m_lookLayerNum = 1;
     InitStageData(m_widthBlockNum, m_depthBlockNum);
 }
 
@@ -27,7 +28,8 @@ void CEditorStageData::DrawMapSizeEditor()
     ImGui::Begin("MapSize");
     isChangedStageSize |= ImGui::SliderInt("縦の大きさ", &m_depthBlockNum, 1, 100);
     isChangedStageSize |= ImGui::SliderInt("横の大きさ", &m_widthBlockNum, 1, 100);
-    isChangedStageSize |= ImGui::SliderInt("レイヤーの数", &m_layerNum, 1, 100);
+    isChangedStageSize |= ImGui::SliderInt("レイヤーの数", &m_layerNum, 1, 10);
+    ImGui::SliderInt("編集中のレイヤー", &m_lookLayerNum, 1, m_layerNum);
     ImGui::End();
     if (isChangedStageSize)
     {
@@ -38,6 +40,15 @@ void CEditorStageData::DrawMapSizeEditor()
 
 void CEditorStageData::InitStageData(const int& x, const int& z)
 {
+    stageData2.resize(m_layerNum);
+    for (int i = 0; i < m_layerNum; i++)
+    {
+        stageData2[i].resize(m_depthBlockNum);
+        for (int j = 0; j < m_depthBlockNum; j++)
+        {
+            stageData2[i][j].resize(m_widthBlockNum);
+        }       
+    }
     stageData.resize(z);
     for (int i = 0; i < z; i++)
     {
@@ -45,14 +56,19 @@ void CEditorStageData::InitStageData(const int& x, const int& z)
     }
 }
 
-bool CEditorStageData::IsValidGridPosition(const int& depth, const int& width)
+bool CEditorStageData::IsValidGridPosition(const int& width, const int& depth) const
 {
     return (depth >= 0 && width >= 0 &&
         depth < m_depthBlockNum &&
         width < m_widthBlockNum);
 }
 
-int CEditorStageData::GetData(const int x, const int y) const
+int CEditorStageData::GetData(const int& x, const int& z) const
 {
-    return stageData[x][y];
+    return stageData2[m_lookLayerNum - 1][z][x];
+}
+
+void CEditorStageData::SetData(const int& x, const int& z, const int& data)
+{
+    stageData2[m_lookLayerNum - 1][z][x] = data;   
 }

@@ -43,10 +43,10 @@ void CEditorStage::Update()
 void CEditorStage::GetStageSize()
 {
     if (m_pStageData != nullptr &&
-        m_pStageData->stageData.size() != m_depthSize || m_pStageData->stageData[0].size() != m_widthSize)
+        m_pStageData->GetDepthSize() != m_depthSize || m_pStageData->GetWidthSize() != m_widthSize)
     {
-        m_depthSize = m_pStageData->stageData.size();
-        m_widthSize = m_pStageData->stageData[0].size();
+        m_depthSize = m_pStageData->GetDepthSize();
+        m_widthSize = m_pStageData->GetWidthSize();
     }
 }
 
@@ -67,7 +67,7 @@ void CEditorStage::CheckData()
     {
         for (int x = 0; x < m_widthSize; x++)
         {
-            int tmpStageData = m_pStageData->GetData(z, x);
+            int tmpStageData = m_pStageData->GetData(x, z);
             //ステージデータが空の場合
             if (tmpStageData == 0) continue;
             ProcessStageData(x * 10, z * 10, tmpStageData);

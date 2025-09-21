@@ -7,8 +7,11 @@ class CEditorStageData : public Object3D
 public:
     CEditorStageData();
     void Update() override;
-    int GetData(const int x, const int y) const;
-    bool IsValidGridPosition(const int& depth, const int& width);
+    int GetData(const int& x, const int& z) const;
+    void SetData(const int& x, const int& z, const int& data);
+    int GetWidthSize() const {return m_widthBlockNum; }
+    int GetDepthSize() const {return m_depthBlockNum; }
+    bool IsValidGridPosition(const int& depth, const int& width) const;
 
     //一桁目マップチップの種類
     //１，まっすぐな道、２．カーブ、３．ゴールライン
@@ -26,4 +29,5 @@ private:
     int m_depthBlockNum;
     int m_widthBlockNum;
     int m_layerNum;
+    int m_lookLayerNum;
 };
