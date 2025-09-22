@@ -46,7 +46,7 @@ void CEditorCamera::Update()
     }
     else if (isPushShift && mouseState.lZ != notMove)
     {
-        //高速前後移動
+        //上下移動
         m_comeraPos.z += mouseState.lZ * sensitivity;
     }
 

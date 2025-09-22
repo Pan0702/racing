@@ -1,5 +1,7 @@
 #include "EditorObjectMove.h"
 #include <cmath>
+#include <functional>
+
 #include "algorithm"
 #include "EditorCamera.h"
 #include "EditorChangeWorldCoordinate.h"
@@ -7,10 +9,14 @@
 namespace
 {
     // 定数定義
-     constexpr int GRID_SIZE = 10;
-     constexpr int SNAP_THRESHOLD = 5;
-     constexpr int EMPTY_CELL = 0;
+    constexpr int GRID_SIZE = 10;
+    constexpr int SNAP_THRESHOLD = 5;
+    constexpr int EMPTY_CELL = 0;
+    constexpr int MAX_ROTATION = 3;
+    constexpr int ROTATION_STEP = 10;
+    constexpr int FULL_ROTATION = 30;
 }
+
 
 // コンストラクタ - 初期化処理
 CEditorObjectMove::CEditorObjectMove()
@@ -82,14 +88,14 @@ void CEditorObjectMove::ObjectMove()
         m_pStage->ProcessStageData
         (static_cast<int>(m_worldPosition.x),
          static_cast<int>(m_worldPosition.z),
-         m_tmpStageData);
+         m_holdStageData);
     }
 }
 
 // オブジェクトを掴む処理
 void CEditorObjectMove::GrabObject(const int& depth, const int& width)
 {
-    m_tmpStageData = m_pStageData->GetData(width, depth);
+    m_holdStageData = m_pStageData->GetData(width, depth);
     m_pStageData->SetData(width,depth,EMPTY_CELL);
     m_tmpDepth = depth;
     m_tmpWidth = width;
@@ -103,13 +109,13 @@ void CEditorObjectMove::PlaceObject(const int& placeDepth, const int& placeWidth
     {
         if (m_pStageData->GetData(placeWidth, placeDepth) == EMPTY_CELL)
         {
-            m_pStageData->SetData(placeWidth, placeDepth,m_tmpStageData);
+            m_pStageData->SetData(placeWidth, placeDepth,m_holdStageData);
         }
     }
     else
     {
         // 配置位置が無効な場合は元の位置に戻す
-        m_pStageData->SetData(m_tmpWidth, m_tmpDepth,m_tmpStageData);
+        m_pStageData->SetData(m_tmpWidth, m_tmpDepth,m_holdStageData);
     }
     isHoldObject = false;
 }
@@ -117,29 +123,37 @@ void CEditorObjectMove::PlaceObject(const int& placeDepth, const int& placeWidth
 void CEditorObjectMove::RotateYObject()
 {
     if (!isHoldObject)return;
-    if (GameDevice()->m_pDI->CheckMouse(KD_TRG, DIM_RBUTTON))
+    DIMOUSESTATE mouseState = GameDevice()->m_pDI->GetMouseState();
+    if (mouseState.lZ != 0)
     {
-        m_tmpStageData += 10;
-        Clamp();
+        int direction = (mouseState.lZ > 0) ? 0 : 1;
+        m_holdStageData = Clamp(direction);
+
     }
 }
 
-void CEditorObjectMove::Clamp()
+int CEditorObjectMove::Clamp(const int& rotateDirection)
 {
-    //4以降は角度が0になるから
-    if ((m_tmpStageData / 10)> 3)
-    {
-        m_tmpStageData = m_tmpStageData - 40;
-    }
+    // 回転方向のマップ
+
+    int currentRotation = (m_holdStageData / ROTATION_STEP) + (rotateDirection == 0 ? 1 : -1);
     
+    // 回転値をクランプ
+    if (currentRotation > MAX_ROTATION) {
+        return m_holdStageData - FULL_ROTATION;
+    } else if (currentRotation < 0) {
+        return m_holdStageData + FULL_ROTATION;
+    }
+    return m_holdStageData + (rotateDirection == 0 ? ROTATION_STEP : -ROTATION_STEP);
 }
+
 
 void CEditorObjectMove::HoldNewObject(const int& stageDetaNum)
 {
     if (isHoldObject)
     {
-        m_pStageData->SetData(m_tmpWidth, m_tmpDepth,m_tmpStageData);
+        m_pStageData->SetData(m_tmpWidth, m_tmpDepth,m_holdStageData);
    }
-    m_tmpStageData = stageDetaNum;
+    m_holdStageData = stageDetaNum;
     isHoldObject = true;
 }

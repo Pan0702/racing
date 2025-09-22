@@ -19,14 +19,14 @@ private:
     void PlaceObject(const int& placeDepth, const int& placeWidth);
     void ObjectMove();
     void RotateYObject();
-    void Clamp();
+    int Clamp(const int& rotateDirection);
 
     XMFLOAT3 m_worldPosition;
     CEditorStageData* m_pStageData;
     CEditorStage* m_pStage;
 
     bool isHoldObject;
-    int m_tmpStageData;
+    int m_holdStageData;
     int m_tmpWidth;
     int m_tmpDepth;
 };

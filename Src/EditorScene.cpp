@@ -10,6 +10,7 @@
 #include "EditorStage.h"
 #include "EditorStageData.h"
 #include "EditorChangeWorldCoordinate.h"
+#include "EditorStageExport.h"
 
 
 CEditorScene::CEditorScene()
@@ -31,7 +32,10 @@ CEditorScene::~CEditorScene()
 
 void CEditorScene::Update()
 {
-
+    if (ImGui::Button("ボタン"))
+    {
+        new CEditorStageExport();
+    }
 }
 
 void CEditorScene::Draw()

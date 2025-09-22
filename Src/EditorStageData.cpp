@@ -25,7 +25,7 @@ void CEditorStageData::DrawMapSizeEditor()
     // 左上
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiCond_FirstUseEver);
-    ImGui::Begin("MapSize");
+    ImGui::Begin("StageSize");
     isChangedStageSize |= ImGui::SliderInt("縦の大きさ", &m_depthBlockNum, 1, 100);
     isChangedStageSize |= ImGui::SliderInt("横の大きさ", &m_widthBlockNum, 1, 100);
     isChangedStageSize |= ImGui::SliderInt("レイヤーの数", &m_layerNum, 1, 10);

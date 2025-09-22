@@ -11,6 +11,7 @@ public:
     void SetData(const int& x, const int& z, const int& data);
     int GetWidthSize() const {return m_widthBlockNum; }
     int GetDepthSize() const {return m_depthBlockNum; }
+    int GetLayerSize() const {return m_layerNum; }
     bool IsValidGridPosition(const int& depth, const int& width) const;
 
     //一桁目マップチップの種類

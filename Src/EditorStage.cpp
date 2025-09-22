@@ -91,7 +91,7 @@ void CEditorStage::ProcessStageData(const int x, const int z, int stageData)
     MeshDegSet(angleIndex); // 0, 90, 180, 270度
 
     // タイル種類（1桁目）
-    const int meshType = stageData % TYPE_MODULO;
+    const int meshType = abs(stageData % TYPE_MODULO);
     MeshRender(meshType);
 }
 
@@ -119,7 +119,7 @@ void CEditorStage::MeshRender(const int meshNum)
         loadGoalMesh->Render(transform.matrix());
         break;
     default:
-        assert(false);
+       assert(false);
         break;
     }
 }
