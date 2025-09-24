@@ -2,9 +2,8 @@
 #include <windows.h>
 #include <assert.h>
 
-#include "EditorStageData.h"
-#include "GameObject.h"
-#include "EditorScene.h"
+#include "ModelStorage.h"
+#include "MapEditor/EditorScene.h"
 #include "TitleScene.h"
 #include "PlayScene.h"
 
@@ -12,6 +11,7 @@ SceneBase* SceneFactory::CreateFirst()
 {
 
 	//SingleInstantiate<EditorDataCarrier>();
+	SingleInstantiate<CModelStorage>();
 	return new TitleScene();
 	return nullptr;
 }

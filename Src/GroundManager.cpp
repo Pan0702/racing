@@ -17,21 +17,21 @@ Ground::~Ground()
 
 bool Ground::HitCheckSphere(const VECTOR3& center, float radius, VECTOR3* hit)
 {
-	std::list<MeshCollider::CollInfo> meshes = meshCol->CheckCollisionSphereList(XMMatrixIdentity(), center, radius);
+	std::list<MeshCollider::CollInfoã€€> meshes = meshCol->CheckCollisionSphereList(XMMatrixIdentity(), center, radius);
 	if (meshes.size() == 0)
 		return false;
-	if (hit != nullptr) { // À•W‚ª•K—v‚È‚Ì‚Å‚ ‚ê‚Î
-		VECTOR3 pushVec = VECTOR3(0, 0, 0); // ÅI“I‚É‰Ÿ‚·ƒxƒNƒgƒ‹
-		for (const MeshCollider::CollInfo& m : meshes) { // “–‚½‚Á‚Ä‚¢‚é‚·‚×‚Ä‚Ìƒ|ƒŠƒSƒ“‚Å
+	if (hit != nullptr) { // ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½Kï¿½vï¿½È‚Ì‚Å‚ï¿½ï¿½ï¿½ï¿½
+		VECTOR3 pushVec = VECTOR3(0, 0, 0); // ï¿½ÅIï¿½Iï¿½É‰ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		for (const MeshCollider::CollInfo& m : meshes) { // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚·ï¿½×‚Ä‚Ìƒ|ï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½ï¿½
 			VECTOR3 move = center - m.hitPosition;
-			float len = move.Length(); // “–‚½‚Á‚½“_‚©‚ç’†S‚Ö‚Ì‹——£
+			float len = move.Length(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ç’†ï¿½Sï¿½Ö‚Ì‹ï¿½ï¿½ï¿½
 			move = move * ((radius - len) / len);
-			VECTOR3 push = m.normal * Dot(move, m.normal); // ‰Ÿ‚µ•Ô‚µ‚½‚¢ƒxƒNƒgƒ‹
-			// ¡‚ÌpushVec‚Æ‡¬‚·‚é
-			VECTOR3 pushVecNorm = XMVector3Normalize(pushVec); // ‡¬Ï‚İƒxƒNƒgƒ‹‚ÌŒü‚«
-			float dot = Dot(push, pushVecNorm);	// ‚»‚Ì¬•ª‚Ì’·‚³
+			VECTOR3 push = m.normal * Dot(move, m.normal); // ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+			// ï¿½ï¿½ï¿½ï¿½pushVecï¿½Æï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			VECTOR3 pushVecNorm = XMVector3Normalize(pushVec); // ï¿½ï¿½ï¿½ï¿½ï¿½Ï‚İƒxï¿½Nï¿½gï¿½ï¿½ï¿½ÌŒï¿½ï¿½ï¿½
+			float dot = Dot(push, pushVecNorm);	// ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½Ì’ï¿½ï¿½ï¿½
 			if (dot < pushVec.Length()) {
-				pushVec += push - pushVecNorm * dot; // ‚»‚Ì¬•ª‚ğŒ¸‚ç‚µ‚Ä‚¢‚¢
+				pushVec += push - pushVecNorm * dot; // ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç‚µï¿½Ä‚ï¿½ï¿½ï¿½
 			}
 			else {
 				pushVec = push;
