@@ -32,7 +32,7 @@ CEditorScene::~CEditorScene()
 
 void CEditorScene::Update()
 {
-    if (ImGui::Button("ボタン"))
+    if (ImGui::Button("kakidasi"))
     {
         new CEditorStageExport();
     }

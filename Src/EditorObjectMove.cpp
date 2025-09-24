@@ -73,12 +73,12 @@ void CEditorObjectMove::ObjectMove()
             if (!m_pStageData->IsValidGridPosition(width, depth)) return;
             if (m_pStageData->GetData(width, depth) == EMPTY_CELL) return;
 
-            GrabObject(depth, width);
+            GrabObject(width, depth);
         }
         else
         {
             // オブジェクトを持っている場合：配置処理
-            PlaceObject(depth, width);
+            PlaceObject(width, depth);
         }
     }
 
@@ -93,29 +93,29 @@ void CEditorObjectMove::ObjectMove()
 }
 
 // オブジェクトを掴む処理
-void CEditorObjectMove::GrabObject(const int& depth, const int& width)
+void CEditorObjectMove::GrabObject(const int& width, const int& depth)
 {
     m_holdStageData = m_pStageData->GetData(width, depth);
-    m_pStageData->SetData(width,depth,EMPTY_CELL);
+    m_pStageData->SetData(width, depth, EMPTY_CELL);
     m_tmpDepth = depth;
     m_tmpWidth = width;
     isHoldObject = true;
 }
 
 // オブジェクトを配置する処理
-void CEditorObjectMove::PlaceObject(const int& placeDepth, const int& placeWidth)
+void CEditorObjectMove::PlaceObject(const int& placeWidth, const int& placeDepth)
 {
     if (m_pStageData->IsValidGridPosition(placeWidth, placeDepth))
     {
         if (m_pStageData->GetData(placeWidth, placeDepth) == EMPTY_CELL)
         {
-            m_pStageData->SetData(placeWidth, placeDepth,m_holdStageData);
+            m_pStageData->SetData(placeWidth, placeDepth, m_holdStageData);
         }
     }
     else
     {
         // 配置位置が無効な場合は元の位置に戻す
-        m_pStageData->SetData(m_tmpWidth, m_tmpDepth,m_holdStageData);
+        m_pStageData->SetData(m_tmpWidth, m_tmpDepth, m_holdStageData);
     }
     isHoldObject = false;
 }
@@ -128,7 +128,6 @@ void CEditorObjectMove::RotateYObject()
     {
         int direction = (mouseState.lZ > 0) ? 0 : 1;
         m_holdStageData = Clamp(direction);
-
     }
 }
 
@@ -152,8 +151,8 @@ void CEditorObjectMove::HoldNewObject(const int& stageDetaNum)
 {
     if (isHoldObject)
     {
-        m_pStageData->SetData(m_tmpWidth, m_tmpDepth,m_holdStageData);
-   }
+        m_pStageData->SetData(m_tmpWidth, m_tmpDepth, m_holdStageData);
+    }
     m_holdStageData = stageDetaNum;
     isHoldObject = true;
 }

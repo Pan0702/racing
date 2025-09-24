@@ -24,11 +24,11 @@ void CEditorDrawBorderLine::Draw()
     //DrawLine(VECTOR3(0, 0, 0), VECTOR3(0, 0, m_depthBlockNum), RGB(0, 0, 0));
     for (int i = 0; i <= m_x; i++)
     {
-        DrawLine(VECTOR3(i * 10, 0, -10), VECTOR3(i * 10, 0, m_z * 10 - 10), RGB(255, 255, 255));
+        DrawLine(VECTOR3(0, 0, i * 10 - 10), VECTOR3(m_z * 10, 0, i * 10 - 10), RGB(255, 255, 255));
     }
-    for (int i = -1; i < m_z; i++)
+    for (int i = 0; i <= m_z; i++)
     {
-        DrawLine(VECTOR3(0, 0, i * 10), VECTOR3(m_x * 10, 0, i * 10), RGB(0, 255, 0));
+        DrawLine(VECTOR3(i * 10, 0, -10), VECTOR3(i * 10, 0, m_x * 10 - 10), RGB(0, 255, 0));
     }
 }
 

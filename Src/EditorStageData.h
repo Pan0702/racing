@@ -12,7 +12,7 @@ public:
     int GetWidthSize() const {return m_widthBlockNum; }
     int GetDepthSize() const {return m_depthBlockNum; }
     int GetLayerSize() const {return m_layerNum; }
-    bool IsValidGridPosition(const int& depth, const int& width) const;
+    bool IsValidGridPosition(const int& width, const int& depth) const;
 
     //一桁目マップチップの種類
     //１，まっすぐな道、２．カーブ、３．ゴールライン

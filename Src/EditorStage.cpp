@@ -97,7 +97,7 @@ void CEditorStage::ProcessStageData(const int x, const int z, int stageData)
 
 void CEditorStage::MeshPosSet(const int width, const int height, const int depth)
 {
-    transform.position = VECTOR3(width, height, depth);  // NOLINT(bugprone-narrowing-conversions)
+    transform.position = VECTOR3(width, height, depth);  
 }
 
 void CEditorStage::MeshDegSet(const float& degNum)

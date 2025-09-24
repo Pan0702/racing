@@ -49,11 +49,6 @@ void CEditorStageData::InitStageData(const int& x, const int& z)
             stageData2[i][j].resize(m_widthBlockNum);
         }       
     }
-    stageData.resize(z);
-    for (int i = 0; i < z; i++)
-    {
-        stageData[i].resize(x);
-    }
 }
 
 bool CEditorStageData::IsValidGridPosition(const int& width, const int& depth) const
