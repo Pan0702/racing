@@ -1,7 +1,6 @@
 #include "Stage.h"
 #include <vector>
 #include "Player.h"
-#include "Coin.h"
 
 /*std::vector<std::vector<int>> map = {  
 	{ 1, 1, 2, 1 },  //map[0].size()
@@ -44,10 +43,6 @@ Stage::Stage()
 			if (map[z][x] == 2)
 			{
 				new Player(VECTOR3(x, 0, -z));
-			}
-			else if (map[z][x] == 3)
-			{
-				new Coin(VECTOR3(x, 0, -z));
 			}
 			else if (map[z][x] == 10)
 			{

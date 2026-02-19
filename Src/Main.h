@@ -1,45 +1,45 @@
 //=============================================================================
-//		‚R‚cƒQ[ƒ€ƒvƒƒOƒ‰ƒ€			               ver 3.2        2023.1.31
+//		ï¿½Rï¿½cï¿½Qï¿½[ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½			               ver 3.2        2023.1.31
 //
-//		ƒEƒBƒ“ƒhƒEƒY‚ÌŽåˆ—
+//		ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½Yï¿½ÌŽåˆï¿½ï¿½
 //																Main.h
 //=============================================================================
 
 #pragma once
 
-//ƒwƒbƒ_[ƒtƒ@ƒCƒ‹‚ÌƒCƒ“ƒNƒ‹[ƒh
+//ï¿½wï¿½bï¿½_ï¿½[ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌƒCï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½[ï¿½h
 #include <stdio.h>
 #include <windows.h>
 
 #include "resource.h"
 //#include "GameMain.h"
 
-//’è”’è‹`
-//#define WINDOW_WIDTH   1920 //ƒEƒBƒ“ƒhƒE•
-//#define WINDOW_HEIGHT  1080 //ƒEƒBƒ“ƒhƒE‚‚³
+//ï¿½è”ï¿½ï¿½`
+#define WINDOW_WIDTH   1920 //ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½
+#define WINDOW_HEIGHT  1080 //ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½ï¿½
 
-#define WINDOW_WIDTH   1366   //ƒEƒBƒ“ƒhƒE•
-#define WINDOW_HEIGHT  768    //ƒEƒBƒ“ƒhƒE‚‚³
+// #define WINDOW_WIDTH   1366   //ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½
+// #define WINDOW_HEIGHT  768    //ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½ï¿½
 
 #define APP_NAME _T("Project")
 
 class CGameMain;
 
 //  ---------------------------------------------------------
-//  WindowsƒƒCƒ“ƒNƒ‰ƒX
+//  Windowsï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½X
 //  ---------------------------------------------------------
 class CMain
 {
 public:
-	// ƒƒ“ƒo•Ï”
-	CGameMain*	   m_pGMain;		  // ƒQ[ƒ€ƒƒCƒ“ƒNƒ‰ƒX
+	// ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½Ïï¿½
+	CGameMain*	   m_pGMain;		  // ï¿½Qï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½X
 	HINSTANCE      m_hInstance;
 	HWND           m_hWnd;
-	bool           m_bLoopFlag;       // ƒ‹[ƒvƒtƒ‰ƒO@true:ƒ‹[ƒv@false:ƒ‹[ƒvI—¹
-	double         m_MainLoopTime;    // ƒ‹[ƒvƒXƒs[ƒh@1/60Sec
+	bool           m_bLoopFlag;       // ï¿½ï¿½ï¿½[ï¿½vï¿½tï¿½ï¿½ï¿½Oï¿½@true:ï¿½ï¿½ï¿½[ï¿½vï¿½@false:ï¿½ï¿½ï¿½[ï¿½vï¿½Iï¿½ï¿½
+	double         m_MainLoopTime;    // ï¿½ï¿½ï¿½[ï¿½vï¿½Xï¿½sï¿½[ï¿½hï¿½@1/60Sec
 
 public:
-	// ƒƒ\ƒbƒh
+	// ï¿½ï¿½ï¿½\ï¿½bï¿½h
 	HRESULT InitWindow(HINSTANCE,INT,INT,INT,INT,LPCTSTR);
 	LRESULT MsgProc(HWND,UINT,WPARAM,LPARAM);
 	HRESULT Init();
@@ -51,9 +51,9 @@ public:
 	CMain();
 	~CMain();
 };
-// ŠÖ”ƒvƒƒgƒ^ƒCƒv‚ÌéŒ¾
+// ï¿½Öï¿½ï¿½vï¿½ï¿½ï¿½gï¿½^ï¿½Cï¿½vï¿½ÌéŒ¾
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-// imGUI2‚Ìƒvƒƒgƒ^ƒCƒv                                                       // -- 2020.8.7
+// imGUI2ï¿½Ìƒvï¿½ï¿½ï¿½gï¿½^ï¿½Cï¿½v                                                       // -- 2020.8.7
 LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 

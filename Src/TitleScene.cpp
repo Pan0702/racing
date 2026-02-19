@@ -17,8 +17,9 @@ void TitleScene::Update()
 	}
 	if (GameDevice()->m_pDI->
 			CheckKey(KD_TRG, DIK_M)) {
-		SceneManager::ChangeScene("MapEditor");
+		SceneManager::ChangeScene("EditorScene2");
 	}
+	
 
 }
 

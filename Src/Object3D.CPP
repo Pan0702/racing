@@ -15,44 +15,9 @@ Object3D::~Object3D()
 		delete animator;
 		animator = nullptr;
 	}
-	if (mesh != nullptr) {
-		delete mesh;
-		mesh = nullptr;
-	}
-	if (meshCol != nullptr) {
-		delete meshCol;
-		meshCol = nullptr;
-	}
-	if (loadStraightMesh != nullptr)
-	{
-		delete loadStraightMesh;
-		loadStraightMesh = nullptr;
-	}
-	if (loadCurveMesh != nullptr)
-	{
-		delete loadCurveMesh;
-		loadCurveMesh = nullptr;
-	}
-	if (loadGoalMesh != nullptr)
-	{
-		delete loadGoalMesh;
-		loadGoalMesh = nullptr;
-	}
-	if (loadStraightColl != nullptr)
-	{
-		delete loadStraightColl;
-		loadStraightColl = nullptr;
-	}
-	if (loadCurveColl != nullptr)
-	{
-		delete loadCurveColl;
-		loadCurveColl = nullptr;
-	}
-	if (loadGoalColl != nullptr)
-	{
-		delete loadGoalColl;
-		loadGoalColl = nullptr;
-	}
+	// mesh, meshCol などは、サブクラスで new している場合は、そのサブクラスで delete すること。
+	// ここで delete すると、CModelStorage から共有されているメッシュを delete してしまい、
+	// 二重解放やアクセス違反の原因になる。
 }
 
 void Object3D::Update()

@@ -22,7 +22,7 @@ CFbxMesh::CFbxMesh() : CFbxMesh(GameDevice()->m_pFbxMeshCtrl)
 }
 CFbxMesh::CFbxMesh(CFbxMeshCtrl* pFbxMeshCtrl)
 {
-	ZeroMemory(this, sizeof(this));
+	ZeroMemory(this, sizeof(CFbxMesh));
 	m_pD3D = pFbxMeshCtrl->m_pD3D;
 	m_pShader = pFbxMeshCtrl->m_pShader;
 	m_pFbxMeshCtrl = pFbxMeshCtrl;                    // -- 2021.2.4
@@ -33,7 +33,7 @@ CFbxMesh::CFbxMesh(CFbxMeshCtrl* pFbxMeshCtrl)
 }
 CFbxMesh::CFbxMesh(CFbxMeshCtrl* pFbxMeshCtrl, const TCHAR* FName)
 {
-	ZeroMemory(this, sizeof(this));
+	ZeroMemory(this, sizeof(CFbxMesh));
 	m_pD3D = pFbxMeshCtrl->m_pD3D;
 	m_pShader = pFbxMeshCtrl->m_pShader;
 	m_pFbxMeshCtrl = pFbxMeshCtrl;                    // -- 2021.2.4
@@ -1121,7 +1121,7 @@ void CFbxMesh::MakeRootAnimAndShaderMatrix(const int& animNum, ROOTANIMTYPE RATy
 	for (int mi = 0; mi < m_dwMeshNum; mi++)   // メッシュ数だけ繰り返し
 	{
 		// シェーダーへ渡す形式の行列を作成
-		// （シェーダーへ渡すときは、①各フレーム毎の②ボーン毎に並べておく必要がある）
+		// （シェーダーへ渡すときは、?@各フレーム毎の?Aボーン毎に並べておく必要がある）
 		// （フレームポーズ数は、一つのメッシュのボーンでは全て同じなので、m_BoneArray[animNum][0].framePoseNumを使用する）
 		m_pMeshArray[mi].m_pBoneShader[animNum] = new BONESHADER[m_pMeshArray[mi].m_BoneArray[animNum][0].framePoseNum];  // シェーダーボーン配列を生成する
 

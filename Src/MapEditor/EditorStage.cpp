@@ -35,13 +35,6 @@ void CEditorStage::InitializeMeshes()
 CEditorStage::~CEditorStage()
 {
     // メッシュの所有権は CModelStorage にある
-    // Object3D::~Object3D が delete しないよう nullptr にする
-    loadStraightMesh = nullptr;
-    loadStraightColl = nullptr;
-    loadCurveMesh    = nullptr;
-    loadCurveColl    = nullptr;
-    loadGoalMesh     = nullptr;
-    loadGoalColl     = nullptr;
 }
 
 
@@ -97,7 +90,7 @@ void CEditorStage::ProcessStageData(const int x, const int z, int stageData)
     MeshPosSet(x, height, z);
 
     // 角度情報（2桁目）
-    const int angleIndex = (stageData % HEIGHT_DIVISOR) / ANGLE_DIVISOR;
+    const float angleIndex = (stageData % HEIGHT_DIVISOR) / ANGLE_DIVISOR;
     MeshDegSet(angleIndex); // 0, 90, 180, 270度
 
     // タイル種類（1桁目）

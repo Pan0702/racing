@@ -32,7 +32,7 @@ CFbxMesh* CModelStorage::GetModel(const std::string& name) const
     {
         if (m.name == name) return m.mesh;
     }
-    assert("Model:%sのMeshが見つかりません",name);
+    // assert("Model:%sのMeshが見つかりません",name);
     return nullptr;
 }
 
@@ -42,7 +42,7 @@ MeshCollider* CModelStorage::GetCollider(const std::string& name) const
     {
         if (m.name == name) return m.coll;
     }
-    assert("Model:%sのColliderが見つかりません",name);
+    // assert("Model:%sのColliderが見つかりません",name);
     return nullptr;
 }
 
@@ -62,5 +62,4 @@ void CModelStorage::LoadModel()
     initMesh("Plane", "data/mesh/load-Plane.mesh");
     initMesh( "Curve", "data/mesh/load-Curve.mesh");
     initMesh(  "GoalLine", "data/mesh/load-Plane-GoalLIne.mesh");
-    MessageBox(0, _T("True"), nullptr, MB_OK);
 }

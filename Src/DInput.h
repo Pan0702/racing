@@ -190,6 +190,9 @@ public:
 	bool GetMouse(void);
 	bool CheckMouse(const int&, const DWORD&);
 	DIMOUSESTATE GetMouseState( void );
+	float GetMouseWheel() const;
+	bool IsMouseMove();
+	bool IsMoveInput();
 	POINT GetMousePos(); //マウスの現在の座標を取得する
 	void ShowMouseCursor(bool bFlag);
 	bool InitMouse(HWND);

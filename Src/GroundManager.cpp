@@ -17,7 +17,7 @@ Ground::~Ground()
 
 bool Ground::HitCheckSphere(const VECTOR3& center, float radius, VECTOR3* hit)
 {
-	std::list<MeshCollider::CollInfo　> meshes = meshCol->CheckCollisionSphereList(XMMatrixIdentity(), center, radius);
+	std::list<MeshCollider::CollInfo> meshes = meshCol->CheckCollisionSphereList(XMMatrixIdentity(), center, radius);
 	if (meshes.size() == 0)
 		return false;
 	if (hit != nullptr) { // ���W���K�v�Ȃ̂ł����

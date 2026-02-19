@@ -6,6 +6,7 @@
 #include "MapEditor/EditorScene.h"
 #include "TitleScene.h"
 #include "PlayScene.h"
+#include "MapEditorVer2/EditorScene2.h"
 
 SceneBase* SceneFactory::CreateFirst()
 {
@@ -28,6 +29,10 @@ SceneBase * SceneFactory::Create(const std::string & name)
 	if (name == "MapEditor")
 	{
 		return new CEditorScene();
+	}
+	if (name == "EditorScene2")
+	{
+		return new EditorScene2();
 	}
 	assert(false);
 	return nullptr;
