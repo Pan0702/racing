@@ -1,19 +1,42 @@
 #include "Controller.h"
 
+#include "TRSObject/TRS.h"
+
 Controller::Controller()
 {
     camera_ = ObjectManager::FindGameObject<Camera>();
+     trs_ = ObjectManager::FindGameObject<TRS>();
 }
 
 void Controller::Update()
 {
     CameraControl();
     //つかむ処理
+    if (true)
+    {
+        TRSControl();
+    }else
+    {
+        trs_->SetState(TRS::State::kNone);
+    }
+}
+
+void Controller::TRSControl() const
+{
     auto input = GameDevice()->m_pDI;
     if (input == nullptr) return;
 
-    if (input->CheckMouse(KD_TRG, DIM_LBUTTON))
+    if (input->CheckKey(KD_TRG, DIK_W))
     {
+        trs_->SetState(TRS::State::kTranslation);
+    }
+    if (input->CheckKey(KD_TRG, DIK_E))
+    {
+        trs_->SetState(TRS::State::kRotation);
+    }
+    if (input->CheckKey(KD_TRG, DIK_R))
+    {
+        trs_->SetState(TRS::State::kScaling);
     }
 }
 

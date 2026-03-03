@@ -5,7 +5,7 @@ void StageData::AddTile(VECTOR3 pos, int tile_id)
     stage_data_.push_back({ pos, tile_id });
 }
 
-int StageData::GetTile(VECTOR3 pos)
+int StageData::GetTile(const VECTOR3& pos)
 {
     return 0;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "ModelCreator.h"
 #include "../Object3D.h"
 
 static constexpr int PREVIEW_SIZE = 128;
@@ -24,40 +25,36 @@ struct ImageButtonData
     std::string buttonID;
     ID3D11ShaderResourceView* pTexture;
     ImVec2 size;
+    int state;
     bool isLoaded;
     bool isRenderTexture; // trueの場合ReleaseAllTexturesで解放しない
 
-    ImageButtonData(const std::string& id, const ImVec2& buttonSize)
-        : buttonID(id), size(buttonSize), pTexture(nullptr), isLoaded(false), isRenderTexture(false)
+    ImageButtonData(const std::string& id, const ImVec2& buttonSize, int buttonState = 0)
+        : buttonID(id), size(buttonSize), state(buttonState), pTexture(nullptr), isLoaded(false), isRenderTexture(false)
     {
     }
 };
 
-class Buttom : public Object3D
+class Button : public Object3D
 {
     
 private:
-    enum ButtonState
-    {
-        state_straight = 1,
-        state_curve,
-        state_GoalLine
-    };
-
-    XMFLOAT3 m_worldPosition;
-    std::vector<ImageButtonData> m_imageButtons;
-    std::vector<ModelPreviewRT>  m_modelPreviews;
+    VECTOR3 world_position_;
+    std::vector<ImageButtonData> image_buttons_;
+    std::vector<ModelPreviewRT>  model_previews_;
+    ModelCreator* model_creator_;
 public:
-    Buttom();
-    ~Buttom();
+    Button();
+    ~Button();
     void Update() override;
+    void AddButton(const std::string& button_ID, CFbxMesh* mesh = nullptr,const ImVec2& size = ImVec2(64, 64));
 
 private:
     void InitializeButtons();
     void ReleaseAllTextures();
     void CreateImageButton(const ImageButtonData& buttonData);
     void HandleButtonClick(const std::string& buttonID);
-    void DebugImgui();
+    void DebugImGui();
 
     // pMesh は CModelStorage が所有するので delete しない
     static ModelPreviewRT CreateModelPreviewRT(CFbxMesh* pMesh);

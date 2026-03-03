@@ -1,7 +1,7 @@
 //=============================================================================
-//		‚R‚cƒQ[ƒ€ƒvƒƒOƒ‰ƒ€@@@@@                 ver 3.2        2023.1.31
+//		ï¿½Rï¿½cï¿½Qï¿½[ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½@ï¿½@ï¿½@ï¿½@                 ver 3.2        2023.1.31
 //
-//		ƒQ[ƒ€‚ÌƒƒCƒ“ˆ—
+//		ï¿½Qï¿½[ï¿½ï¿½ï¿½Ìƒï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //																GameMain.cpp
 //=============================================================================
 #include "GameMain.h"
@@ -15,38 +15,38 @@ namespace {
 
 // ============================================================================================
 //
-// CGameMain ƒQ[ƒ€ƒƒCƒ“ƒNƒ‰ƒX‚Ìˆ—
+// CGameMain ï¿½Qï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½Ìï¿½ï¿½ï¿½
 //
 // ============================================================================================
 //------------------------------------------------------------------------
 //
-//	ƒQ[ƒ€ƒƒCƒ“ƒNƒ‰ƒX‚ÌƒRƒ“ƒXƒgƒ‰ƒNƒ^	
+//	ï¿½Qï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½ÌƒRï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^	
 //
-//  ˆø”@‚È‚µ
+//  ï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½È‚ï¿½
 //
 //------------------------------------------------------------------------
 CGameMain::CGameMain(CMain*	pMain)
 {
 	gameMainInstance = this;
-	m_pMain = pMain;		// ƒƒCƒ“ƒNƒ‰ƒX
+	m_pMain = pMain;		// ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½X
 
-	m_pD3D = nullptr;			//	Direct3DƒIƒuƒWƒFƒNƒg
-	m_pXAudio = nullptr;		//	XAudioƒIƒuƒWƒFƒNƒg
-	m_pDI = nullptr;			//	DirectInputDƒIƒuƒWƒFƒNƒg
-	m_pFont = nullptr;			//	ƒtƒHƒ“ƒgƒeƒNƒXƒ`ƒƒ[
-	m_pShader = nullptr;		//	ƒVƒF[ƒ_[
-	m_pFbxMeshCtrl = nullptr;	// ƒƒbƒVƒ…ƒRƒ“ƒgƒ[ƒ‹ƒNƒ‰ƒX
+	m_pD3D = nullptr;			//	Direct3Dï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½g
+	m_pXAudio = nullptr;		//	XAudioï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½g
+	m_pDI = nullptr;			//	DirectInputDï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½g
+	m_pFont = nullptr;			//	ï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½[
+	m_pShader = nullptr;		//	ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[
+	m_pFbxMeshCtrl = nullptr;	// ï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½X
 
-	// ƒJƒƒ‰Eƒ‰ƒCƒgEƒrƒ…[
-	m_vEyePt = VECTOR3(0,0,0);		// ƒJƒƒ‰iŽ‹“_jˆÊ’u
-	m_vLookatPt = VECTOR3(0,0,0);	// ’Ž‹ˆÊ’u
-	m_mView = XMMatrixIdentity();	// ƒrƒ…[ƒ}ƒgƒŠƒbƒNƒX
-	m_mProj = XMMatrixIdentity();	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“ƒ}ƒgƒŠƒbƒNƒX
-	m_vLightDir = VECTOR3(0,0,0);	// ƒfƒBƒŒƒNƒVƒ‡ƒiƒ‹ƒ‰ƒCƒg‚Ì•ûŒü
+	// ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½Eï¿½ï¿½ï¿½Cï¿½gï¿½Eï¿½rï¿½ï¿½ï¿½[
+	m_vEyePt = VECTOR3(0,0,0);		// ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½_ï¿½jï¿½Ê’u
+	m_vLookatPt = VECTOR3(0,0,0);	// ï¿½ï¿½ï¿½ï¿½ï¿½Ê’u
+	m_mView = XMMatrixIdentity();	// ï¿½rï¿½ï¿½ï¿½[ï¿½}ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½X
+	m_mProj = XMMatrixIdentity();	// ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½X
+	m_vLightDir = VECTOR3(0,0,0);	// ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½Vï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½gï¿½Ì•ï¿½ï¿½ï¿½
 }
 //------------------------------------------------------------------------
 //
-//	ƒQ[ƒ€ƒƒCƒ“ƒNƒ‰ƒX‚ÌƒfƒXƒgƒ‰ƒNƒ^	
+//	ï¿½Qï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½Ìƒfï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^	
 //
 //------------------------------------------------------------------------
 CGameMain::~CGameMain()
@@ -54,7 +54,7 @@ CGameMain::~CGameMain()
 	SceneManager::Release();
 	ObjectManager::Release();
 	ResourceManager::Reset();
-	MyImgui::ImguiQuit();          // -- 2020.11.15    // MyImgui‚ÌI—¹ˆ—
+	MyImgui::ImguiQuit();          // -- 2020.11.15    // MyImguiï¿½ÌIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	SAFE_DELETE(m_pFbxMeshCtrl);    // -- 2021.2.4
 	SAFE_DELETE(m_pShader);
@@ -63,83 +63,83 @@ CGameMain::~CGameMain()
 	SAFE_DELETE(m_pXAudio);
 	SAFE_DELETE(m_pD3D);
 
-	CoUninitialize();   // COM‚Ì‰ð•ú
+	CoUninitialize();   // COMï¿½Ì‰ï¿½ï¿½
 }
 
 //------------------------------------------------------------------------
 //
-//	ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Ì‰Šú‰»ˆ—	
+//	ï¿½Aï¿½vï¿½ï¿½ï¿½Pï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	
 //
-//  ˆø”@‚È‚µ
+//  ï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½È‚ï¿½
 //
-//	–ß‚è’l HRESULT
-//		S_OK	= ³í
-//		E_FAIL	= ˆÙí
+//	ï¿½ß‚ï¿½l HRESULT
+//		S_OK	= ï¿½ï¿½ï¿½ï¿½
+//		E_FAIL	= ï¿½Ùï¿½
 //
 //------------------------------------------------------------------------
 HRESULT CGameMain::Init()
 {
-	// ‚b‚n‚l‚Ì‰Šú‰»
+	// ãƒãƒƒã‚·ãƒ¥å€¤ã®åˆæœŸåŒ–
 	//CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	CoInitialize(nullptr);
 
-	// Direct3D‚Ì‰Šú‰»
+	// Direct3Dï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	m_pD3D = new CDirect3D;
 	if (FAILED(m_pD3D->InitD3D(m_pMain->m_hWnd, WINDOW_WIDTH, WINDOW_HEIGHT))) {
-		MessageBox(0, _T("Direct3D‚ð‰Šú‰»o—ˆ‚Ü‚¹‚ñ"), nullptr, MB_OK);
+		MessageBox(0, _T("Direct3Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½"), nullptr, MB_OK);
 		return E_FAIL;
 	}
 
-	// ƒVƒF[ƒ_[‚Ì‰Šú‰»
+	// ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	m_pShader = new CShader(m_pD3D);
 	if (FAILED(m_pShader->InitShader())) {
-		MessageBox(0, _T("Shader‚ð¶¬E‰Šú‰»o—ˆ‚Ü‚¹‚ñ"), nullptr, MB_OK);
+		MessageBox(0, _T("Shaderï¿½ð¶ï¿½ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½"), nullptr, MB_OK);
 		return E_FAIL;
 	}
 
-	// XAudio2‚Ì‰Šú‰»
+	// XAudio2ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	m_pXAudio = new CXAudio;
 	if (FAILED(m_pXAudio->InitAudio(m_pMain->m_hWnd))) {
-		MessageBox(0, _T("XAudio2‚ð‰Šú‰»o—ˆ‚Ü‚¹‚ñ"), nullptr, MB_OK);
+		MessageBox(0, _T("XAudio2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½"), nullptr, MB_OK);
 		return E_FAIL;
 	}
 
-	// DirectInput‚Ì‰Šú‰»
+	// DirectInputï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	m_pDI = new CDirectInput;
 	if (!(m_pDI->StartDirectInput(m_pMain->m_hInstance, m_pMain->m_hWnd, 
                     INIT_KEYBOARD | INIT_MOUSE | INIT_JOYSTICK, WINDOW_WIDTH, WINDOW_HEIGHT))) {
-		MessageBox(0, _T("DirectInput‚ð‰Šú‰»o—ˆ‚Ü‚¹‚ñ"), nullptr, MB_OK);
+		MessageBox(0, _T("DirectInputï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½"), nullptr, MB_OK);
 		return E_FAIL;
 	}
 
-	// ƒtƒHƒ“ƒgƒeƒNƒXƒ`ƒƒ[‚Ì‰Šú‰»
+	// ï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	m_pFont = new CFontTexture(m_pShader);
 
-	// MyImgui‚Ì‰Šú‰»
+	// MyImguiï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	MyImgui::ImguiInit(m_pMain->m_hWnd, m_pD3D, WINDOW_WIDTH, WINDOW_HEIGHT);           // -- 2020.11.15
 
-	// FbxƒƒbƒVƒ…ƒRƒ“ƒgƒ[ƒ‹ƒNƒ‰ƒX
+	// Fbxï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½X
 	m_pFbxMeshCtrl = new CFbxMeshCtrl(m_pShader);                       // -- 2021.2.4
 
 	// ----------------------------------------------------------------------------------------
-	// •Ï”‚Ì‰Šú‰»
-	m_vLightDir = normalize( VECTOR3(0.8f, 1, -1) );  // ŒõŒ¹À•W‚Ì‰Šú’lB³‹K‰»‚·‚é
+	// ï¿½Ïï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
+	m_vLightDir = normalize( VECTOR3(0.8f, 1, -1) );  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½Ìï¿½ï¿½ï¿½ï¿½lï¿½Bï¿½ï¿½ï¿½Kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€iŽË‰e•ÏŠ·j‚Ì‰Šú’l
+	// ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½tï¿½Hï¿½[ï¿½ï¿½ï¿½iï¿½Ë‰eï¿½ÏŠï¿½ï¿½jï¿½Ìï¿½ï¿½ï¿½ï¿½l
 	//m_mProj = XMMatrixPerspectiveFovLH((FLOAT)(XM_PI / 4), (FLOAT)WINDOW_WIDTH / (FLOAT)WINDOW_HEIGHT, 0.1f, 1000.0);
 	m_mProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(38.0f), (FLOAT)WINDOW_WIDTH / (FLOAT)WINDOW_HEIGHT, 0.1f, 1000.0);
 
-	// ƒrƒ…[ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€iŽ‹“_À•W•ÏŠ·j‚Ì‰Šú’l
-	VECTOR3 vUpVec(0.0f, 1.0f, 0.0f);//ã•ûˆÊ’u
+	// ï¿½rï¿½ï¿½ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½tï¿½Hï¿½[ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Wï¿½ÏŠï¿½ï¿½jï¿½Ìï¿½ï¿½ï¿½ï¿½l
+	VECTOR3 vUpVec(0.0f, 1.0f, 0.0f);//ï¿½ï¿½ï¿½ï¿½Ê’u
 	m_vEyePt = VECTOR3(0.0f, 4.0f, -5.0f);
 	m_vLookatPt = VECTOR3(0.0f, 2.0f, 0.0f);
 	m_mView = XMMatrixLookAtLH(m_vEyePt, m_vLookatPt, vUpVec);
 
-	// Šeƒ}ƒl[ƒWƒƒ[‚ÌÅ‰‚É‚P‰ñ‚¾‚¯ŽÀs‚·‚éˆ—
+	// ï¿½eï¿½}ï¿½lï¿½[ï¿½Wï¿½ï¿½ï¿½[ï¿½ÌÅï¿½ï¿½É‚Pï¿½ñ‚¾‚ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½éˆï¿½ï¿½
 	SceneManager::Start();
 	ObjectManager::Start();
 
-	// ƒŠƒtƒŒƒbƒVƒ…ƒŒ[ƒg‚ðÝ’è‚·‚é
+	// ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½gï¿½ï¿½Ý’è‚·ï¿½ï¿½
 	MainControl::UseFrameTimer(1.0f / 60.0f);
 
 	return S_OK;
@@ -147,21 +147,21 @@ HRESULT CGameMain::Init()
 
 //------------------------------------------------------------------------
 //
-//	ƒQ[ƒ€‚Ìƒ‹[ƒvˆ—	
+//	ï¿½Qï¿½[ï¿½ï¿½ï¿½Ìƒï¿½ï¿½[ï¿½vï¿½ï¿½ï¿½ï¿½	
 //
-//  ˆø”@‚È‚µ
+//  ï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½È‚ï¿½
 //
-//	–ß‚è’l ‚È‚µ
+//	ï¿½ß‚ï¿½l ï¿½È‚ï¿½
 //
 //------------------------------------------------------------------------
 void CGameMain::Update()
 {
-	MyImgui::ImguiNewFrame();   // MyImgui•`‰æ‘Oˆ—    // -- 2020.11.15
+	MyImgui::ImguiNewFrame();   // MyImguiï¿½`ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½    // -- 2020.11.15
 
-	m_pDI->GetInput();			// “ü—Íî•ñ‚ÌŽæ“¾
-	m_pFont->Refresh();         // ƒtƒHƒ“ƒgî•ñ‚ÌƒŠƒtƒŒƒbƒVƒ…
+	m_pDI->GetInput();			// ï¿½ï¿½ï¿½Íï¿½ï¿½ÌŽæ“¾
+	m_pFont->Refresh();         // ï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ìƒï¿½ï¿½tï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½
 
-	if (m_pDI->CheckKey(KD_TRG, DIK_F4))  ChangeScreenMode();   // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚ÌØ‚è‘Ö‚¦       // -- 2018.12.14
+	if (m_pDI->CheckKey(KD_TRG, DIK_F4))  ChangeScreenMode();   // ï¿½tï¿½ï¿½ï¿½Xï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌØ‚ï¿½Ö‚ï¿½       // -- 2018.12.14
 
 	SceneManager::Update();
 	ObjectManager::Update();
@@ -169,11 +169,11 @@ void CGameMain::Update()
 
 //------------------------------------------------------------------------
 //
-//	ƒQ[ƒ€‚ÌƒƒCƒ“ˆ—	
+//	ï¿½Qï¿½[ï¿½ï¿½ï¿½Ìƒï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	
 //
-//  ˆø”@‚È‚µ
+//  ï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½È‚ï¿½
 //
-//	–ß‚è’l ‚È‚µ
+//	ï¿½ß‚ï¿½l ï¿½È‚ï¿½
 //
 //------------------------------------------------------------------------
 void CGameMain::GameMain()
@@ -182,27 +182,27 @@ void CGameMain::GameMain()
 
 void CGameMain::Draw()
 {
-	//‰æ–ÊƒNƒŠƒAiŽÀÛ‚Í’PF‚Å‰æ–Ê‚ð“h‚è‚Â‚Ô‚·ˆ—j
-	float ClearColor[4] = { 0,0,0,1 };// ƒNƒŠƒAFì¬@RGBA‚Ì‡
-	m_pD3D->ClearRenderTarget(ClearColor); // ‰æ–ÊƒNƒŠƒA
+	//ï¿½ï¿½ÊƒNï¿½ï¿½ï¿½Aï¿½iï¿½ï¿½ï¿½Û‚Í’Pï¿½Fï¿½Å‰ï¿½Ê‚ï¿½hï¿½ï¿½Â‚Ô‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½j
+	float ClearColor[4] = { 0,0,0,1 };// ï¿½Nï¿½ï¿½ï¿½Aï¿½Fï¿½ì¬ï¿½@RGBAï¿½Ìï¿½
+	m_pD3D->ClearRenderTarget(ClearColor); // ï¿½ï¿½ÊƒNï¿½ï¿½ï¿½A
 
 	SceneManager::Draw();
 	ObjectManager::Draw();
 
-	MyImgui::ImguiRender();      // MyImguiŽÀ•`‰æˆ—    // -- 2020.11.15
+	MyImgui::ImguiRender();      // MyImguiï¿½ï¿½ï¿½`ï¿½æˆï¿½ï¿½    // -- 2020.11.15
 
-	//‰æ–ÊXViƒoƒbƒNƒoƒbƒtƒ@‚ðƒtƒƒ“ƒgƒoƒbƒtƒ@‚Éj
+	//ï¿½ï¿½ÊXï¿½Vï¿½iï¿½oï¿½bï¿½Nï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½gï¿½oï¿½bï¿½tï¿½@ï¿½Éj
 	m_pD3D->m_pSwapChain->Present(1, 0);                   // 60fps Vsync
-	//m_pD3D->m_pSwapChain->Present(0, 0);                   // Vsync‚È‚µ
+	//m_pD3D->m_pSwapChain->Present(0, 0);                   // Vsyncï¿½È‚ï¿½
 }
 
 //------------------------------------------------------------------------
 //
-//	ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌI—¹ˆ—	
+//	ï¿½Aï¿½vï¿½ï¿½ï¿½Pï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ÌIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	
 //
-//  ˆø”@‚È‚µ
+//  ï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½È‚ï¿½
 //
-//	–ß‚è’l ‚È‚µ
+//	ï¿½ß‚ï¿½l ï¿½È‚ï¿½
 //
 //------------------------------------------------------------------------
 void CGameMain::Quit()
@@ -212,30 +212,30 @@ void CGameMain::Quit()
 
 //------------------------------------------------------------------------    // -- 2018.12.14
 //
-//	ƒEƒBƒ“ƒhƒEƒ‚[ƒh‚Æƒtƒ‹ƒXƒNƒŠ[ƒ“ƒ‚[ƒh‚ðØ‚è‘Ö‚¦‚éˆ—	
+//	ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½[ï¿½hï¿½Æƒtï¿½ï¿½ï¿½Xï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½Ø‚ï¿½Ö‚ï¿½ï¿½éˆï¿½ï¿½	
 //
-//  ˆø”@ƒ‚[ƒh  0:ƒEƒCƒ“ƒhƒEƒ‚[ƒh@1:ƒtƒ‹ƒXƒNƒŠ[ƒ“@-1:ƒ‚[ƒhØ‚è‘Ö‚¦iÈ—ª’lj
+//  ï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½ï¿½ï¿½[ï¿½h  0:ï¿½Eï¿½Cï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½[ï¿½hï¿½@1:ï¿½tï¿½ï¿½ï¿½Xï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½@-1:ï¿½ï¿½ï¿½[ï¿½hï¿½Ø‚ï¿½Ö‚ï¿½ï¿½iï¿½È—ï¿½ï¿½lï¿½j
 //
-//	–ß‚è’l ‚È‚µ
+//	ï¿½ß‚ï¿½l ï¿½È‚ï¿½
 //
 //------------------------------------------------------------------------
 HRESULT CGameMain::ChangeScreenMode(int nMode)
 {
 	HRESULT Ret = S_OK;
-	BOOL bFullScreen;  // ƒtƒ‹ƒXƒNƒŠ[ƒ“ƒ‚[ƒh‚©H
+	BOOL bFullScreen;  // ï¿½tï¿½ï¿½ï¿½Xï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½H
 
-	//	Œ»Ý‚ÌƒXƒNƒŠ[ƒ“ƒ‚[ƒh‚ð“¾‚é
+	//	ï¿½ï¿½ï¿½Ý‚ÌƒXï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ð“¾‚ï¿½
 	m_pD3D->m_pSwapChain->GetFullscreenState(&bFullScreen, nullptr);
 
 	switch (nMode)
 	{
-	case 0:    // ƒEƒCƒ“ƒhƒEƒ‚[ƒh‚É‚·‚é
+	case 0:    // ï¿½Eï¿½Cï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½[ï¿½hï¿½É‚ï¿½ï¿½ï¿½
 		if( bFullScreen ) Ret = m_pD3D->m_pSwapChain->SetFullscreenState(false, nullptr);
 		break;
-	case 1:    // ƒtƒ‹ƒXƒNƒŠ[ƒ“ƒ‚[ƒh‚É‚·‚é
+	case 1:    // ï¿½tï¿½ï¿½ï¿½Xï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½É‚ï¿½ï¿½ï¿½
 		if( !bFullScreen ) Ret = m_pD3D->m_pSwapChain->SetFullscreenState(true, nullptr);
 		break;	
-	default:   // Œ»Ý‚Ìƒ‚[ƒh‚ðØ‚è‘Ö‚¦‚é
+	default:   // ï¿½ï¿½ï¿½Ý‚Ìƒï¿½ï¿½[ï¿½hï¿½ï¿½Ø‚ï¿½Ö‚ï¿½ï¿½ï¿½
 		if (bFullScreen)
 		{
 			Ret = m_pD3D->m_pSwapChain->SetFullscreenState(false, nullptr);

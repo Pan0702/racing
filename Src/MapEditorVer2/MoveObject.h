@@ -1,6 +1,6 @@
 #pragma once
 
-class TouchObject
+class MoveObject
 {
 public:
     

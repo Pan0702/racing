@@ -1,56 +1,55 @@
 #include "Buttom.h"
+
+#include "FileDialog.h"
 #include "../ModelStorage.h"
 struct ImageButtonData;
 class CFbxMesh;
 
-Buttom::Buttom()
+Button::Button()
 {
-    m_worldPosition = VECTOR3(0.0f, 0.0f, 0.0f);
+    world_position_ = VECTOR3(0.0f, 0.0f, 0.0f);
 
     // CModelStorage からメッシュを取得して1回だけ描画し SRV に焼き付ける
     CModelStorage* storage = ObjectManager::FindGameObject<CModelStorage>();
     if (storage)
     {
-        m_modelPreviews.push_back(CreateModelPreviewRT(storage->GetModel("Plane")));
-        m_modelPreviews.push_back(CreateModelPreviewRT(storage->GetModel("Curve")));
-        m_modelPreviews.push_back(CreateModelPreviewRT(storage->GetModel("GoalLine")));
+        AddButton("Plane",storage->GetModel("Plane"));
+        AddButton("Curve",storage->GetModel("Curve"));
+        AddButton("GoalLine",storage->GetModel("GoalLine"));
     }
 
-    InitializeButtons();
+    model_creator_ = new ModelCreator();
 }
 
-Buttom::~Buttom()
+Button::~Button()
 {
     ReleaseAllTextures();
     ReleaseModelPreviews();
 }
 
-void Buttom::Update()
+void Button::Update()
 {
-    DebugImgui();
+    DebugImGui();
 }
 
-// ボタンの初期化
-void Buttom::InitializeButtons()
+void Button::AddButton(const std::string& button_ID, CFbxMesh* mesh, const ImVec2& size)
 {
-    const char* ids[] = {"straight", "curve", "goalline"};
-    for (int i = 0; i < 3; i++)
+    ImageButtonData data(button_ID, size);
+    if (mesh)
     {
-        ImageButtonData data(ids[i], ImVec2(64, 64));
-        if (i < (int)m_modelPreviews.size())
-        {
-            data.pTexture = m_modelPreviews[i].pSRV;
-            data.isLoaded = (m_modelPreviews[i].pSRV != nullptr);
-            data.isRenderTexture = true;
-        }
-        m_imageButtons.push_back(data);
+        ModelPreviewRT rt = CreateModelPreviewRT(mesh);
+        model_previews_.push_back(rt);
+        data.pTexture        = rt.pSRV;
+        data.isLoaded        = (rt.pSRV != nullptr);
+        data.isRenderTexture = true;
     }
+    image_buttons_.push_back(data);
 }
 
 // 全テクスチャの解放（isRenderTextureのものはスキップ）
-void Buttom::ReleaseAllTextures()
+void Button::ReleaseAllTextures()
 {
-    for (auto& button : m_imageButtons)
+    for (auto& button : image_buttons_)
     {
         if (button.pTexture && !button.isRenderTexture)
         {
@@ -58,13 +57,13 @@ void Buttom::ReleaseAllTextures()
             button.pTexture = nullptr;
         }
     }
-    m_imageButtons.clear();
+    image_buttons_.clear();
 }
 
 // CModelStorage のメッシュを借りて1回だけ描画し SRV に焼き付ける（メッシュは所有しない）
 // pMesh を受け取り、オフスクリーンの PREVIEW_SIZE x PREVIEW_SIZE テクスチャに1回だけ描画して
 // そのSRVをImGuiボタン用として返す。pMesh の所有権はここで取らない（CModelStorageが管理）。
-ModelPreviewRT Buttom::CreateModelPreviewRT(CFbxMesh* pMesh)
+ModelPreviewRT Button::CreateModelPreviewRT(CFbxMesh* pMesh)
 {
     ModelPreviewRT rt = {};
     if (!pMesh) return rt;
@@ -101,7 +100,7 @@ ModelPreviewRT Buttom::CreateModelPreviewRT(CFbxMesh* pMesh)
     pCtx->RSGetViewports(&numVP, &oldVP);
 
     //プレビュー用ビューポートの設定
-    D3D11_VIEWPORT vp = {0, 0, (float)PREVIEW_SIZE, (float)PREVIEW_SIZE, 0.0f, 1.0f};
+    D3D11_VIEWPORT vp = {0, 0, static_cast<float>(PREVIEW_SIZE), static_cast<float>(PREVIEW_SIZE), 0.0f, 1.0f};
     pCtx->RSSetViewports(1, &vp);
 
     //レンダリングターゲットの設定とクリア
@@ -121,15 +120,17 @@ ModelPreviewRT Buttom::CreateModelPreviewRT(CFbxMesh* pMesh)
     return rt;
 }
 
-void Buttom::ReleaseModelPreviews()
+void Button::ReleaseModelPreviews()
 {
-    for (auto& rt : m_modelPreviews)
+    for (auto& rt : model_previews_)
+    {
         rt.Release();
-    m_modelPreviews.clear();
+    }
+    model_previews_.clear();
 }
 
 // 画像ボタンの作成
-void Buttom::CreateImageButton(const ImageButtonData& buttonData)
+void Button::CreateImageButton(const ImageButtonData& buttonData)
 {
     if (buttonData.isLoaded && buttonData.pTexture)
     {
@@ -146,24 +147,34 @@ void Buttom::CreateImageButton(const ImageButtonData& buttonData)
 }
 
 // ボタンクリック時の処理
-void Buttom::HandleButtonClick(const std::string& buttonID)
+void Button::HandleButtonClick(const std::string& buttonID)
 {
+
 }
 
 // ImGuiでの表示
-void Buttom::DebugImgui()
+void Button::DebugImGui()
 {
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 10), ImGuiCond_FirstUseEver);
-    ImGui::Begin("エディタツール");
+    ImGui::Begin("Editor Tools");
 
     ImGui::Separator();
-    ImGui::Text("オブジェクト配置");
+    ImGui::Text("Add Model");
+    if (ImGui::Button("OpenModel"))
+    {
+        std::string path = Platform::OpenFileDialog(L"*.mesh");
+        if (!path.empty())
+        {
+            model_creator_->CreateModel(path);
+        }
+    }
+    ImGui::Separator();
     ImGui::BeginGroup();
     {
-        for (size_t i = 0; i < m_imageButtons.size(); i++)
+        for (size_t i = 0; i < image_buttons_.size(); i++)
         {
-            CreateImageButton(m_imageButtons[i]);
-            if (i < m_imageButtons.size() - 1) ImGui::SameLine();
+            CreateImageButton(image_buttons_[i]);
+            if (i < image_buttons_.size() - 1) ImGui::SameLine();
         }
     }
     ImGui::EndGroup();

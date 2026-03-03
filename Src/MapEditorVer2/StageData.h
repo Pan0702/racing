@@ -14,7 +14,7 @@ public:
     StageData() = default;
     ~StageData() = default;
     void AddTile(VECTOR3 pos, int tile_id);
-    int GetTile(VECTOR3 pos);
+    int GetTile(const VECTOR3& pos);
     void DeleteTile(int id);
 };
 
