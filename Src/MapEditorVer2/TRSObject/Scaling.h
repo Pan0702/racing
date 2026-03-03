@@ -8,5 +8,5 @@ private:
 public:
     CScaling();
     ~CScaling();
-    void Draw();
+    void Draw() override{}
 };

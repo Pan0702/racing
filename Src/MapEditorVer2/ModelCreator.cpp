@@ -2,6 +2,7 @@
 #include <string>
 
 #include "Buttom.h"
+#include "../ModelStorage.h"
 #include "../ObjectManager.h"
 
 void ModelCreator::CreateModel(const std::string& path)
@@ -35,5 +36,6 @@ void ModelCreator::CreateModel(const std::string& path)
     {
         models_.push_back(info);
         ObjectManager::FindGameObject<Button>()->AddButton(name, info.mesh);
+        ObjectManager::FindGameObject<CModelStorage>()->AddModel(name.c_str(), path.c_str());
     }
 }

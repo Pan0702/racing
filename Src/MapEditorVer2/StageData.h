@@ -1,4 +1,6 @@
 #pragma once
+#include "MouseRay.h"
+#include "../ModelStorage.h"
 #include "../Object3D.h"
 
 class StageData : public Object3D
@@ -6,15 +8,36 @@ class StageData : public Object3D
 private:
     struct StageDataInfo
     {
-        VECTOR3 pos;
-        int tile_id;
+        Transform transform;
+        std::string model_name;
+        StageDataInfo()
+        {
+            transform.position = VECTOR3(0, 0, 0);
+            model_name = "";
+        }
+        StageDataInfo(const std::string& model_name_,const VECTOR3& pos_) 
+        {
+            model_name = std::move(model_name_);
+            transform.position = pos_;
+        }
     };
     std::vector<StageDataInfo> stage_data_;
+    CModelStorage* model_storage_;
+    int selected_model_ = -1;
+private:
+    void Draw () override;
 public:
-    StageData() = default;
+    StageData();
     ~StageData() = default;
-    void AddTile(VECTOR3 pos, int tile_id);
-    int GetTile(const VECTOR3& pos);
-    void DeleteTile(int id);
+    void AddTile(VECTOR3 pos, const std::string& model_name);
+    int RayHitTest(const Ray& ray, MeshCollider::CollInfo* collOut);
+    void DeleteTile(int index);
+    
+    void SetSelectPos(const VECTOR3& pos);
+    void SetSelectRot(const VECTOR3& rot);
+    void SetSelectSca(const VECTOR3& sca);
+    Transform* GetSelectedTransform();
+
+    void SetModel(int index);
 };
 

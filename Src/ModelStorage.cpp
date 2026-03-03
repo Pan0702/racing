@@ -46,6 +46,17 @@ MeshCollider* CModelStorage::GetCollider(const std::string& name) const
     return nullptr;
 }
 
+void CModelStorage::AddModel(const char* name,const char* path)
+{
+    modelStorage m{};
+    m.name = name;
+    m.mesh = new CFbxMesh();
+    m.coll = new MeshCollider();
+    m.mesh->Load(path);
+    m.coll->MakeFromMesh(m.mesh);
+    m_aModelList.push_back(m);
+}
+
 void CModelStorage::LoadModel()
 {
 

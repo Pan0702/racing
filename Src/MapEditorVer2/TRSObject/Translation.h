@@ -9,5 +9,5 @@ private:
 public:
     CTranslation();
     ~CTranslation();
-    void Draw();
+    void Draw() override{}
 };

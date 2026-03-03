@@ -24,18 +24,3 @@ CScaling::~CScaling()
 {
 }
 
-void CScaling::Draw()
-{
-    if (x_info_.mesh_ != nullptr)
-    {
-        x_info_.mesh_->Render(transform.matrix());
-    }
-    if (y_info_.mesh_ != nullptr)
-    {
-        y_info_.mesh_->Render(transform.matrix());
-    }
-    if (z_info_.mesh_ != nullptr)
-    {
-        z_info_.mesh_->Render(transform.matrix());
-    }
-}

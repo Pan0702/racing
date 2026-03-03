@@ -8,6 +8,6 @@ private:
 public:
     CRotation();
     ~CRotation();
-
-    void Draw();
+    void Draw() override{}
+    
 };

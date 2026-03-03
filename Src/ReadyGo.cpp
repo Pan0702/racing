@@ -6,8 +6,8 @@ ReadyGo::ReadyGo()
 {
 	readyImage = new CSpriteImage(GameDevice()->m_pShader);
 	readyImage->Load("data/images/ready.png");
-	start = VECTOR2(WINDOW_WIDTH, WINDOW_HEIGHT/2); // ˆÚ“®ŠJŽn
-	stop = VECTOR2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2); // ˆÚ“®I—¹
+	start = VECTOR2(WINDOW_WIDTH, WINDOW_HEIGHT/2); // ï¿½Ú“ï¿½ï¿½Jï¿½n
+	stop = VECTOR2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2); // ï¿½Ú“ï¿½ï¿½Iï¿½ï¿½
 	position = start;
 
 	goImage = new CSpriteImage(GameDevice()->m_pShader);
@@ -25,7 +25,7 @@ ReadyGo::~ReadyGo()
 void ReadyGo::Update()
 {
 	readyCounter++;
-	if (readyCounter <= 30) { // ready‚¾‚¯“®‚©‚·‚Ì‚Å
+	if (readyCounter <= 30) { // readyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½
 		float rate = readyCounter / 30.0f;
 //		rate = easeOutBounce(rate);
 		position = Lerp<VECTOR2>(start, stop, rate);

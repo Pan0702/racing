@@ -3,13 +3,16 @@
 #include "Buttom.h"
 #include "Controller.h"
 #include "../MapTips/Curve.h"
+#include "../MapTips/Plane.h"
 #include "TRSObject/TRS.h"
+#include "StageData.h"
 
 EditorScene2::EditorScene2()
 {
-
     new Camera();
-    new Curve();
+    //new Curve();
+    //new Plane();
+    new StageData();
     new Button();
     new TRS();
     new Controller();

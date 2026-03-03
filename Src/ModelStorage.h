@@ -10,7 +10,7 @@ public:
     ~CModelStorage();
     CFbxMesh* GetModel(const std::string& name) const;
     MeshCollider* GetCollider(const std::string& name) const;
-    
+    void AddModel(const char* name, const char* path);
 private:
     void LoadModel();
     struct modelStorage

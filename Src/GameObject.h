@@ -1,6 +1,6 @@
 #pragma once
 /// <summary>
-/// ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ÌŠî’êƒNƒ‰ƒX
+/// ï¿½Qï¿½[ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ÌŠï¿½ï¿½Nï¿½ï¿½ï¿½X
 /// </summary>
 /// <author>N.Hanai</author>
 
@@ -16,85 +16,85 @@ public:
 	virtual ~GameObject() {}
 
 	/// <summary>
-	/// ƒIƒuƒWƒFƒNƒg‚ð¶¬ŒãAÅ‰‚ÉUpdate()‚Ì‘O‚ÉŒÄ‚Î‚ê‚Ü‚·
+	/// ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ð¶ï¿½ï¿½ï¿½Aï¿½Åï¿½ï¿½ï¿½Update()ï¿½Ì‘Oï¿½ÉŒÄ‚Î‚ï¿½Ü‚ï¿½
 	/// </summary>
 	virtual void Start() {}
 
 	/// <summary>
-	/// –ˆƒtƒŒ[ƒ€‚ÌXVˆ—‚Ì‚½‚ß‚ÉŒÄ‚Î‚ê‚Ü‚·
+	/// ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌXï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ß‚ÉŒÄ‚Î‚ï¿½Ü‚ï¿½
 	/// </summary>
 	virtual void Update() {}
 
 	/// <summary>
-	/// –ˆƒtƒŒ[ƒ€‚Ì•`‰æˆ—‚Ì‚½‚ß‚ÉŒÄ‚Î‚ê‚Ü‚·
+	/// ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ì•`ï¿½æˆï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ß‚ÉŒÄ‚Î‚ï¿½Ü‚ï¿½
 	/// </summary>
 	virtual void Draw() {}
 
 	/// <summary>
-	/// Ž©•ª‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ðíœ‚·‚éŽž‚ÉŒÄ‚Ño‚µ‚Ä‚­‚¾‚³‚¢
-	/// ŽŸ‰ñ‚ÌUpdate‚Ì‘O‚Éíœ‚³‚ê‚Ü‚·
+	/// ï¿½ï¿½ï¿½ï¿½ï¿½ÌƒCï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½íœï¿½ï¿½ï¿½éŽžï¿½ÉŒÄ‚Ñoï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	/// ï¿½ï¿½ï¿½ï¿½ï¿½Updateï¿½Ì‘Oï¿½Éíœï¿½ï¿½ï¿½ï¿½Ü‚ï¿½
 	/// </summary>
 	virtual void DestroyMe() {
 		ObjectManager::Destroy(this);
 	}
 
 	/// <summary>
-	/// ƒV[ƒ“‚ª•Ï‚í‚é‚Æ‚«‚Éíœ‚µ‚È‚¢‚æ‚¤‚É‚µ‚Ü‚·
+	/// ï¿½Vï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Ï‚ï¿½ï¿½Æ‚ï¿½ï¿½Éíœï¿½ï¿½ï¿½È‚ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½Ü‚ï¿½
 	/// </summary>
 	void DontDestroyMe() {
 		ObjectManager::DontDestroy(this);
 	}
 
 	/// <summary>
-	/// ˆ—‚Ì—Dæ‡ˆÊ‚ðŽw’è‚µ‚Ü‚·
-	/// ”’l‚ª‚‚¢‡‚ÉŽÀs‚³‚ê‚Ü‚·
-	/// ‰½‚àŽw’è‚µ‚È‚¯‚ê‚ÎA‚O‚Å‚·
+	/// ï¿½ï¿½ï¿½ï¿½ï¿½Ì—Dï¿½æ‡ï¿½Ê‚ï¿½ï¿½wï¿½è‚µï¿½Ü‚ï¿½
+	/// ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÉŽï¿½ï¿½sï¿½ï¿½ï¿½ï¿½Ü‚ï¿½
+	/// ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½è‚µï¿½È‚ï¿½ï¿½ï¿½ÎAï¿½Oï¿½Å‚ï¿½
 	/// </summary>
-	/// <param name="pri">—Dæ‡ˆÊ</param>
+	/// <param name="pri">ï¿½Dï¿½æ‡ï¿½ï¿½</param>
 	void SetPriority(int pri) {
 		ObjectManager::SetPriority(this, pri);
 	}
 
 	/// <summary>
-	/// •`‰æ‚Ì—Dæ‡ˆÊ‚ðŽw’è‚µ‚Ü‚·
-	/// ”’l‚ª‚‚¢‚Ù‚ÇAŒã‚©‚ç•`‰æ‚³‚ê‚é‚Ì‚ÅA
-	/// 2D‚Å‚ ‚ê‚ÎAŽè‘O‚É•\Ž¦‚³‚ê‚Ü‚·
-	/// ‰½‚àŽw’è‚µ‚È‚¯‚ê‚Î‚O‚Å‚·
+	/// ï¿½`ï¿½ï¿½Ì—Dï¿½æ‡ï¿½Ê‚ï¿½ï¿½wï¿½è‚µï¿½Ü‚ï¿½
+	/// ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù‚ÇAï¿½ã‚©ï¿½ï¿½`ï¿½æ‚³ï¿½ï¿½ï¿½Ì‚ÅA
+	/// 2Dï¿½Å‚ï¿½ï¿½ï¿½ÎAï¿½ï¿½Oï¿½É•\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½
+	/// ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½è‚µï¿½È‚ï¿½ï¿½ï¿½Î‚Oï¿½Å‚ï¿½
 	/// </summary>
-	/// <param name="odr">•`‰æ‡ˆÊ</param>
+	/// <param name="odr">ï¿½`ï¿½æ‡ï¿½ï¿½</param>
 	void SetDrawOrder(int odr) {
 		ObjectManager::SetDrawOrder(this, odr);
 	}
 
 	/// <summary>
-	/// ƒ^ƒO‚ð‚Â‚¯‚é
-	/// ƒ^ƒO‚Í‚P‚Â‚¾‚¯•t‚¯‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·
+	/// ï¿½^ï¿½Oï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½
+	/// ï¿½^ï¿½Oï¿½Í‚Pï¿½Â‚ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½é‚±ï¿½Æ‚ï¿½ï¿½Å‚ï¿½ï¿½Ü‚ï¿½
 	/// </summary>
-	/// <param name="_tag">ƒ^ƒO</param>
+	/// <param name="_tag">ï¿½^ï¿½O</param>
 	void SetTag(std::string _tag) { tag = _tag; }
 
 	/// <summary>
-	/// Žw’è‚³‚ê‚½ƒ^ƒO‚Æ“¯‚¶‚©‚ð•Ô‚·
+	/// ï¿½wï¿½è‚³ï¿½ê‚½ï¿½^ï¿½Oï¿½Æ“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚ï¿½
 	/// </summary>
-	/// <param name="_tag">ƒ^ƒO</param>
-	/// <returns>“¯‚¶‚Å‚ ‚ê‚Îtrue</returns>
+	/// <param name="_tag">ï¿½^ï¿½O</param>
+	/// <returns>ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½true</returns>
 	bool IsTag(std::string _tag) const { return tag == _tag; }
 
 	/// <summary>
-	/// e‚ÌƒIƒuƒWƒFƒNƒg‚ð•Ô‚·
+	/// ï¿½eï¿½ÌƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½Ô‚ï¿½
 	/// </summary>
-	/// <returns>eƒIƒuƒWƒFƒNƒg‚Ìƒ|ƒCƒ“ƒ^[</returns>
+	/// <returns>ï¿½eï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½Ìƒ|ï¿½Cï¿½ï¿½ï¿½^ï¿½[</returns>
 	GameObject* Parent() const { return pParent; }
 
 	/// <summary>
-	/// e‚ÌƒIƒuƒWƒFƒNƒg‚ðÝ’è‚·‚é
+	/// ï¿½eï¿½ÌƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½Ý’è‚·ï¿½ï¿½
 	/// </summary>
-	/// <returns>eƒIƒuƒWƒFƒNƒg‚Ìƒ|ƒCƒ“ƒ^[</returns>
+	/// <returns>ï¿½eï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½Ìƒ|ï¿½Cï¿½ï¿½ï¿½^ï¿½[</returns>
 	void SetParent(GameObject* _parent) { pParent = _parent; }
 
 private:
-	GameObject* pParent; // e‚ÌƒIƒuƒWƒFƒNƒg
-	std::string tag;     // ƒ^ƒO
+	GameObject* pParent; // ï¿½eï¿½ÌƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½g
+	std::string tag;     // ï¿½^ï¿½O
 };
 
 template <class C> C* Instantiate()

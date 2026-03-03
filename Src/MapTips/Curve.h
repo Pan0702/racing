@@ -6,4 +6,5 @@ class Curve : public Object3D
 public:
     Curve();
     ~Curve();
+    void Draw() override;
 };

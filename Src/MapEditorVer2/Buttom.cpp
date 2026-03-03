@@ -1,6 +1,8 @@
 #include "Buttom.h"
 
+#include "Controller.h"
 #include "FileDialog.h"
+#include "StageData.h"
 #include "../ModelStorage.h"
 struct ImageButtonData;
 class CFbxMesh;
@@ -13,9 +15,9 @@ Button::Button()
     CModelStorage* storage = ObjectManager::FindGameObject<CModelStorage>();
     if (storage)
     {
-        AddButton("Plane",storage->GetModel("Plane"));
-        AddButton("Curve",storage->GetModel("Curve"));
-        AddButton("GoalLine",storage->GetModel("GoalLine"));
+        AddButton("Plane", storage->GetModel("Plane"));
+        AddButton("Curve", storage->GetModel("Curve"));
+        AddButton("GoalLine", storage->GetModel("GoalLine"));
     }
 
     model_creator_ = new ModelCreator();
@@ -39,8 +41,8 @@ void Button::AddButton(const std::string& button_ID, CFbxMesh* mesh, const ImVec
     {
         ModelPreviewRT rt = CreateModelPreviewRT(mesh);
         model_previews_.push_back(rt);
-        data.pTexture        = rt.pSRV;
-        data.isLoaded        = (rt.pSRV != nullptr);
+        data.pTexture = rt.pSRV;
+        data.isLoaded = (rt.pSRV != nullptr);
         data.isRenderTexture = true;
     }
     image_buttons_.push_back(data);
@@ -149,7 +151,8 @@ void Button::CreateImageButton(const ImageButtonData& buttonData)
 // ボタンクリック時の処理
 void Button::HandleButtonClick(const std::string& buttonID)
 {
-
+    VECTOR3 init_pos = {0, 0, 0};
+    ObjectManager::FindGameObject<StageData>()->AddTile(init_pos, buttonID);
 }
 
 // ImGuiでの表示

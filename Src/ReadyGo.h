@@ -13,7 +13,7 @@ private:
 	CSpriteImage* goImage;
 	int readyCounter;
 
-	VECTOR2 position; // •\Ž¦ˆÊ’u
-	VECTOR2 start; // ŠJŽnˆÊ’u
-	VECTOR2 stop; // ˆÚ“®Œã‚ÌˆÊ’u
+	VECTOR2 position; // ï¿½\ï¿½ï¿½ï¿½Ê’u
+	VECTOR2 start; // ï¿½Jï¿½nï¿½Ê’u
+	VECTOR2 stop; // ï¿½Ú“ï¿½ï¿½ï¿½ÌˆÊ’u
 };
