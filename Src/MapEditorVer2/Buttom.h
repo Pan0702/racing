@@ -1,4 +1,5 @@
 #pragma once
+#include "GridDraw.h"
 #include "ModelCreator.h"
 #include "../Object3D.h"
 
@@ -43,6 +44,7 @@ private:
     std::vector<ImageButtonData> image_buttons_;
     std::vector<ModelPreviewRT>  model_previews_;
     ModelCreator* model_creator_;
+    GridDraw* grid_draw_;
 public:
     Button();
     ~Button();

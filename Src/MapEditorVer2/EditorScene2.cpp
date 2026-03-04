@@ -2,6 +2,7 @@
 
 #include "Buttom.h"
 #include "Controller.h"
+#include "GridDraw.h"
 #include "../MapTips/Curve.h"
 #include "../MapTips/Plane.h"
 #include "TRSObject/TRS.h"

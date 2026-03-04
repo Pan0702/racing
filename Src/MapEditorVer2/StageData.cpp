@@ -1,9 +1,16 @@
 #include "StageData.h"
 
-void StageData::AddTile(VECTOR3 pos, const std::string& model_name)
+#include "ExportData.h"
+
+void StageData::AddModel(const VECTOR3& pos, const std::string& model_name)
 {
     StageDataInfo info(model_name, pos);
     stage_data_.push_back(info);
+}
+
+void StageData::Export(const std::string& filename) const
+{
+    ObjectManager::FindGameObject<ExportData>()->ExportAllModels(filename, stage_data_);
 }
 
 
@@ -33,10 +40,10 @@ int StageData::RayHitTest(const Ray& ray,MeshCollider::CollInfo* collOut)
     return hit_index;
 }
 
-void StageData::DeleteTile(int index)
+void StageData::DeleteModel()
 {
-    if (index < 0 || index >= stage_data_.size()) return;
-    stage_data_.erase(stage_data_.begin() + index);
+    if (stage_data_.empty())return;
+    stage_data_.erase(stage_data_.begin() + selected_model_);
 }
 
 

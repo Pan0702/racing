@@ -11,12 +11,15 @@ private:
     TRS* trs_;
     CDirectInput* input_;
     UndoManager* undo_manager_;
+    StageData* stage_data_;
     bool is_catch = false;
 private:
     void Update() override;
+    void Draw() override;
     void TRSControl() const;
     void CameraControl() const;
-    void Draw() override;
+    void HandleLeftClick();
+    void HandleUndoRedo();
 public:
     Controller();
     ~Controller() = default;

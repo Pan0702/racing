@@ -1,5 +1,4 @@
 #include "Buttom.h"
-
 #include "Controller.h"
 #include "FileDialog.h"
 #include "StageData.h"
@@ -21,6 +20,7 @@ Button::Button()
     }
 
     model_creator_ = new ModelCreator();
+    grid_draw_ = new GridDraw();
 }
 
 Button::~Button()
@@ -152,7 +152,7 @@ void Button::CreateImageButton(const ImageButtonData& buttonData)
 void Button::HandleButtonClick(const std::string& buttonID)
 {
     VECTOR3 init_pos = {0, 0, 0};
-    ObjectManager::FindGameObject<StageData>()->AddTile(init_pos, buttonID);
+    ObjectManager::FindGameObject<StageData>()->AddModel(init_pos, buttonID);
 }
 
 // ImGuiでの表示
@@ -183,5 +183,15 @@ void Button::DebugImGui()
     ImGui::EndGroup();
 
     ImGui::Separator();
+    ImGui::End();
+    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300));
+    ImGui::Begin("Setting", nullptr,ImGuiWindowFlags_AlwaysAutoResize);
+    bool flag = grid_draw_->GetDrawFlag() ;
+    ImGui::Checkbox("Grid", &flag); 
+    ImGui::Separator();
+    if (ImGui::Button("Export"))
+    {
+        ObjectManager::FindGameObject<StageData>()->Export("example");
+    }
     ImGui::End();
 }
