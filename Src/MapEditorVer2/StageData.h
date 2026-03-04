@@ -33,11 +33,10 @@ public:
     int RayHitTest(const Ray& ray, MeshCollider::CollInfo* collOut);
     void DeleteTile(int index);
     
-    void SetSelectPos(const VECTOR3& pos);
-    void SetSelectRot(const VECTOR3& rot);
-    void SetSelectSca(const VECTOR3& sca);
     Transform* GetSelectedTransform();
+    void SetSelectedTransform(int index, const Transform& transform);
 
     void SetModel(int index);
+    int GetIndex() const;
 };
 

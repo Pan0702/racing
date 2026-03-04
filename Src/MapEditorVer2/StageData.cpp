@@ -55,20 +55,6 @@ StageData::StageData()
     model_storage_ = ObjectManager::FindGameObject<CModelStorage>();
 }
 
-void StageData::SetSelectPos(const VECTOR3& pos)
-{
-    stage_data_[selected_model_].transform.position = pos;
-}
-
-void StageData::SetSelectRot(const VECTOR3& rot)
-{
-    stage_data_[selected_model_].transform.rotation = rot;
-}
-
-void StageData::SetSelectSca(const VECTOR3& sca)
-{
-    stage_data_[selected_model_].transform.scale = sca;   
-}
 
 void StageData::SetModel(int index)
 {
@@ -76,8 +62,18 @@ void StageData::SetModel(int index)
     selected_model_ = index;
 }
 
+int StageData::GetIndex() const
+{
+    return selected_model_;
+}
+
 Transform* StageData::GetSelectedTransform()
 {
     if (selected_model_ < 0 || selected_model_ >= stage_data_.size()) return nullptr;
     return &stage_data_[selected_model_].transform;
+}
+
+void StageData::SetSelectedTransform(int index, const Transform& transform)
+{
+    stage_data_[index].transform = transform;
 }

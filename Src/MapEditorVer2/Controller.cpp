@@ -1,6 +1,7 @@
 #include "Controller.h"
 
 #include "MouseRay.h"
+#include "UndoManager.h"
 #include "StageData.h"
 #include "TRSObject/TRS.h"
 
@@ -9,6 +10,7 @@ Controller::Controller()
     camera_ = ObjectManager::FindGameObject<Camera>();
     trs_ = ObjectManager::FindGameObject<TRS>();
     input_ = GameDevice()->m_pDI;
+    undo_manager_ = new UndoManager();
 }
 
 
@@ -37,6 +39,14 @@ void Controller::Update()
         camera_->Zoom();
     }
 
+    if (input_->CheckMouse(KD_UTRG, DIM_LBUTTON))
+    {
+        if (is_catch)
+        {
+            trs_->SetDraggingAxis(Axis::None);
+        }
+    }
+    
     // クリックした瞬間
     if (input_->CheckMouse(KD_TRG, DIM_LBUTTON))
     {
@@ -46,6 +56,7 @@ void Controller::Update()
         Axis a = trs_->RayHitTest(ray);
         if (a != Axis::None)
         {
+            undo_manager_->Push();
             trs_->SetDraggingAxis(a);
         }
         else
@@ -58,14 +69,19 @@ void Controller::Update()
             {
                 is_catch = true;
                 data->SetModel(index);
+            }else
+            {
+                is_catch = false;
             }
         }
     }
 
     // ボタンを離したらドラッグ終了
-    if (input_->CheckMouse(KD_UTRG, DIM_LBUTTON))
+
+    bool undo = input_->CheckKey(KD_DAT, DIK_LCONTROL) &&input_->CheckKey(KD_TRG, DIK_Z);
+    if (undo)
     {
-        trs_->SetDraggingAxis(Axis::None);
+        undo_manager_->Undo();
     }
 }
 
@@ -95,10 +111,6 @@ void Controller::TRSControl() const
 
 void Controller::CameraControl() const
 {
-    //nullちぇっく
-    if (input_ == nullptr) return;
-
-
     //回転
     if (input_->IsMouseMove())
     {
@@ -124,15 +136,27 @@ void Controller::Draw()
     ImGui::Separator();
     ImGui::Text("Position: %.2f, %.2f, %.2f", t->position.x,
                 t->position.y, t->position.z);
-    ImGui::DragFloat3("Position", &t->position.x, 0.1f);
+    if (ImGui::DragFloat3("Position", &t->position.x, 0.1f)) {}
+    if (ImGui::IsItemActivated())
+    {
+        undo_manager_->Push();
+    }
     ImGui::Separator();
     ImGui::Text("Rotation: %.2f, %.2f, %.2f", t->rotation.x,
                 t->rotation.y, t->rotation.z);
-    ImGui::DragFloat3("Rotation", &t->rotation.x, 0.1f);
+    if (ImGui::DragFloat3("Rotation", &t->rotation.x, 0.1f)) {}
+    if (ImGui::IsItemActivated())
+    {
+        undo_manager_->Push();
+    }
     ImGui::Separator();
     ImGui::Text("Scale:    %.2f, %.2f, %.2f", t->scale.x,
                 t->scale.y, t->scale.z);
-    ImGui::DragFloat3("Scale", &t->scale.x, 0.1f);
+    if (ImGui::DragFloat3("Scale", &t->scale.x, 0.1f)) {}
+    if (ImGui::IsItemActivated())
+    {
+        undo_manager_->Push();
+    }
     ImGui::Separator();
 
     ImGui::End();

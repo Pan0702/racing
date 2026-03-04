@@ -1,5 +1,6 @@
 #pragma once
 #include "Camera.h"
+#include "UndoManager.h"
 #include "../Object3D.h"
 #include "TRSObject/TRS.h"
 
@@ -9,6 +10,7 @@ private:
     Camera* camera_;
     TRS* trs_;
     CDirectInput* input_;
+    UndoManager* undo_manager_;
     bool is_catch = false;
 private:
     void Update() override;
