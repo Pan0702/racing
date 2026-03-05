@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "StageData.h"
 
 namespace
 {
@@ -20,9 +21,38 @@ void Camera::Update()
 {
 }
 
-// 選択オブジェクトにカメラをフォーカスする（未実装）
+// 選択オブジェクトを仰角45度で見下ろす位置にカメラを配置する
 void Camera::Focus()
 {
+    auto device = GameDevice();
+    if (device == nullptr) return;
+
+    StageData* stage_data = ObjectManager::FindGameObject<StageData>();
+    if (stage_data == nullptr) return;
+
+    Transform* t = stage_data->GetSelectedTransform();
+    if (t == nullptr) return;
+
+    // 現在の Eye-LookAt 距離を維持する
+    VECTOR3 toEye = device->m_vEyePt - device->m_vLookatPt;
+    float dist = sqrtf(toEye.x * toEye.x + toEye.y * toEye.y + toEye.z * toEye.z);
+
+    // 現在の水平方向（XZ平面）を取り出して正規化
+    VECTOR3 horiz = VECTOR3(toEye.x, 0.0f, toEye.z);
+    float hLen = sqrtf(horiz.x * horiz.x + horiz.z * horiz.z);
+    if (hLen > 0.0001f)
+        horiz = VECTOR3(horiz.x / hLen, 0.0f, horiz.z / hLen);
+    else
+        horiz = VECTOR3(1.0f, 0.0f, 0.0f); // 真上にいた場合のフォールバック
+
+    // 仰角45度: cos45° = sin45° = 1/√2 なので水平・垂直成分が等しい
+    constexpr float kCos45 = 0.70710678f;
+    device->m_vLookatPt = t->position;
+    device->m_vEyePt    = t->position
+                        + horiz                        * (dist * kCos45)   // 水平成分
+                        + VECTOR3(0.0f, dist * kCos45, 0.0f);              // 垂直成分
+
+    device->m_mView = XMMatrixLookAtLH(device->m_vEyePt, device->m_vLookatPt, up);
 }
 
 // WASDキーで前後左右にカメラを平行移動する

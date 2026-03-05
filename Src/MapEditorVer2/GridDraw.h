@@ -15,4 +15,5 @@ private:
 public:
     /// <summary>グリッド描画フラグの現在値を返す</summary>
     bool GetDrawFlag() const { return is_grid_draw_; }
+    void SetDrawFlag(bool flag) { is_grid_draw_ = flag; }
 };

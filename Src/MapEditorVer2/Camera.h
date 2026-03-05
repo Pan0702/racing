@@ -7,15 +7,15 @@ public:
     ~Camera();
     void Update() override;
 
-    /// <summary>選択オブジェクトにカメラをフォーカスする（未実装）</summary>
+    /// <summary>選択オブジェクトにカメラをフォーカスする</summary>
     void Focus();
 
     /// <summary>WASDキーでカメラを前後左右に平行移動する</summary>
-    void Move();
+    static void Move();
 
     /// <summary>マウス移動量に応じてカメラの注視点を回転する</summary>
-    void Rotate();
+    static void Rotate();
 
     /// <summary>マウスホイールでカメラを前後方向にズームする</summary>
-    void Zoom();
+    static void Zoom();
 };

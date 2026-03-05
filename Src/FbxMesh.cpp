@@ -186,7 +186,7 @@ bool CFbxMesh::Load(const TCHAR* FName)
 		memcpy_s(&m_dwTextureNum, sizeof(DWORD), p, sizeof(int));         // テクスチャー数を得る
 
 		m_pMaterialDiffuseArray = new VECTOR4[m_dwTextureNum];            // マテリアルディフューズカラー配列     // -- 2020.12.15
-		m_pMaterialSpecularArray = new VECTOR4[m_dwTextureNum];           // マテリアルスペキュラ－カラー配列     // -- 2020.12.15
+		m_pMaterialSpecularArray = new VECTOR4[m_dwTextureNum];           // マテリアルスペキュラ?カラー配列     // -- 2020.12.15
 		m_pTextureArray = new ID3D11ShaderResourceView*[m_dwTextureNum];  // テクスチャー配列を生成する
 		m_pTextureNormalArray = new ID3D11ShaderResourceView*[m_dwTextureNum];  // テクスチャーNormal配列を生成する
 		m_pTextureHeightArray = new ID3D11ShaderResourceView*[m_dwTextureNum];  // テクスチャーHeight配列を生成する   // -- 2020.1.15
@@ -1400,7 +1400,7 @@ MATRIX4X4 CFbxMesh::GetRootAnimMatrices(Animator* animStatus, const int& UpFrame
 // 引数：
 //    const int& UpFrame            アニメーションフレームの現在値からの増分（省略値：０）
 //    const int& StartFrameUp       アニメフレームが開始フレーム（フレーム０）のときの増分値の処理方法（省略値：１）
-//                                    0:XMMatrixIdentity()にする   1:０～１の増分値を使用する
+//                                    0:XMMatrixIdentity()にする   1:０?１の増分値を使用する
 //
 // 戻り値：
 //    MATRIX4X4                     ルートボーンの一つ前の位置からの増分マトリックス
@@ -1441,7 +1441,7 @@ MATRIX4X4 CFbxMesh::GetRootAnimUpMatrices(Animator* animStatus, const int& UpFra
 	if (animFrameW <= 0)
 	{
 		if (StartFrameUp == 0) return XMMatrixIdentity();  // 増分値は０となる
-		animFrameW = 1;                                    // ０～１の増分値を使用する
+		animFrameW = 1;                                    // ０?１の増分値を使用する
 	}
 
 	// ルートボーンアニメの現在フレームのマトリックスを取得
@@ -1734,7 +1734,7 @@ void CFbxMesh::RenderDisplaceStatic(const MATRIX4X4& mWorld, const MATRIX4X4& mV
 	{
 		DWORD i = m_dwRenderIdxArray[mi];   // -- 2018.8.1
 
-		// テクスチャ（ディフューズ、ノーマル、ハイト、スペキュラ）をドメインシェーダーとピクセルシェーダーに渡す。スロット番号は0～3
+		// テクスチャ（ディフューズ、ノーマル、ハイト、スペキュラ）をドメインシェーダーとピクセルシェーダーに渡す。スロット番号は0?3
 		SetShaderTexture(_T("DSPS"), 0, &m_pMeshArray[i].m_pTexture);             // ディフューズテクスチャ
 		SetShaderTexture(_T("DSPS"), 1, &m_pMeshArray[i].m_pTextureNormal);       // ノーマルテクスチャ
 		SetShaderTexture(_T("DSPS"), 2, &m_pMeshArray[i].m_pTextureHeight);       // ハイトテクスチャ
@@ -2136,7 +2136,7 @@ void CFbxMesh::DrawDisplace(Animator* animStatus, const MATRIX4X4& mWorld, const
 	{
 		DWORD i = m_dwRenderIdxArray[mi];
 
-		// テクスチャ（ディフューズ、ノーマル、ハイト、スペキュラ）をドメインシェーダーとピクセルシェーダーに渡す。スロット番号は0～3
+		// テクスチャ（ディフューズ、ノーマル、ハイト、スペキュラ）をドメインシェーダーとピクセルシェーダーに渡す。スロット番号は0?3
 		SetShaderTexture(_T("DSPS"), 0, &m_pMeshArray[i].m_pTexture);             // ディフューズテクスチャ
 		SetShaderTexture(_T("DSPS"), 1, &m_pMeshArray[i].m_pTextureNormal);       // ノーマルテクスチャ
 		SetShaderTexture(_T("DSPS"), 2, &m_pMeshArray[i].m_pTextureHeight);       // ハイトテクスチャ

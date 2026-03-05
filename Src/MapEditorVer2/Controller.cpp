@@ -52,11 +52,15 @@ void Controller::Update()
     {
         camera_->Zoom();
     }
-
+    
+    if (input_->CheckKey(KD_TRG, DIK_F))
+    {
+        camera_->Focus();
+    }
     if (is_catch)
     {
         // BackSpace / Delete でオブジェクト削除
-        bool is_delete = input_->CheckKey(KD_DAT, DIK_BACK) || input_->CheckKey(KD_DAT, DIK_DELETE);
+        bool is_delete = input_->CheckKey(KD_TRG, DIK_BACK) || input_->CheckKey(KD_TRG, DIK_DELETE);
         if (is_delete)
         {
             stage_data_->DeleteModel();

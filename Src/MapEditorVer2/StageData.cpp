@@ -15,6 +15,15 @@ void StageData::AddModel(const VECTOR3& pos, const std::string& model_name)
     stage_data_.push_back(info);
 }
 
+// Transform全体を指定してオブジェクトをステージに追加する（インポート用）
+void StageData::AddModelWithTransform(const std::string& model_name, const Transform& transform)
+{
+    StageDataInfo info;
+    info.model_name = model_name;
+    info.transform  = transform;
+    stage_data_.push_back(info);
+}
+
 // ステージデータをJSONファイルにエクスポートする
 void StageData::Export(const std::string& filename) const
 {

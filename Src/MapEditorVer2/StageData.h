@@ -36,6 +36,11 @@ public:
     /// <param name="pos">配置するワールド座標</param>
     /// <param name="model_name">使用するモデルの名前</param>
     void AddModel(const VECTOR3& pos, const std::string& model_name);
+    
+    /// <summary>Transform  全体を指定してオブジェクト をステージに追加する（インポート用）</summary>               
+    /// <param name="model_name">使用する モデルの名前</param>        
+    /// <param name="transform">配置するTransform（位置・回転・スケール）</param>  
+    void AddModelWithTransform(const std::string& model_name, const Transform& transform);
 
     /// <summary>ステージデータをJSONファイルにエクスポートする</summary>
     /// <param name="filename">出力ファイル名（拡張子なし）</param>

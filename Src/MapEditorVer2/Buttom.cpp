@@ -1,6 +1,7 @@
 #include "Buttom.h"
 #include "Controller.h"
 #include "FileDialog.h"
+#include "Import.h"
 #include "StageData.h"
 #include "../ModelStorage.h"
 struct ImageButtonData;
@@ -9,17 +10,15 @@ class CFbxMesh;
 namespace
 {
     // プレビュー用カメラのパラメータ
-    constexpr float kPreviewCamEyeX   =  5.0f;
-    constexpr float kPreviewCamEyeY   =  5.0f;
-    constexpr float kPreviewCamEyeZ   = -8.0f;
+    constexpr float kPreviewCamDirX   =  5.0f;  // カメラ方向ベクトル（正規化前）
+    constexpr float kPreviewCamDirY   =  5.0f;
+    constexpr float kPreviewCamDirZ   = -8.0f;
     constexpr float kPreviewFovDeg    = 45.0f;
     constexpr float kPreviewAspect    =  1.0f;  // 正方形テクスチャなのでアスペクト比1
-    constexpr float kPreviewNearClip  =  0.1f;
-    constexpr float kPreviewFarClip   = 100.0f;
+    constexpr float kPreviewCamMargin =  1.3f;  // モデルが収まるようにする余白係数
 
     // プレビュー用ライト方向と視点位置（ライト計算用）
     const VECTOR3 kPreviewLightDir = VECTOR3(0.5f, 1.0f, -1.0f);
-    const VECTOR3 kPreviewLightEye = VECTOR3(kPreviewCamEyeX, kPreviewCamEyeY, kPreviewCamEyeZ);
 
     // プレビューのバックグラウンドカラー（暗めのグレー）
     constexpr float kClearR = 0.12f;
@@ -136,14 +135,32 @@ ModelPreviewRT Button::CreateModelPreviewRT(CFbxMesh* pMesh)
     float clearColor[4] = {kClearR, kClearG, kClearB, kClearA};
     pD3D->ClearRenderTarget(clearColor);
 
-    // プレビュー用ビュー・プロジェクション行列を構築してメッシュを描画
-    XMMATRIX mView = XMMatrixLookAtLH(
-        XMVectorSet(kPreviewCamEyeX, kPreviewCamEyeY, kPreviewCamEyeZ, 0),
-        XMVectorZero(),
-        XMVectorSet(0, 1, 0, 0));
+    // モデルの AABB からバウンディングスフィアを計算してカメラ距離を自動調整
+    XMVECTOR center = XMVectorSet(
+        (pMesh->m_vMin.x + pMesh->m_vMax.x) * 0.5f,
+        (pMesh->m_vMin.y + pMesh->m_vMax.y) * 0.5f,
+        (pMesh->m_vMin.z + pMesh->m_vMax.z) * 0.5f, 0.0f);
+    XMVECTOR extents = XMVectorSet(
+        pMesh->m_vMax.x - pMesh->m_vMin.x,
+        pMesh->m_vMax.y - pMesh->m_vMin.y,
+        pMesh->m_vMax.z - pMesh->m_vMin.z, 0.0f);
+    float radius   = XMVectorGetX(XMVector3Length(extents)) * 0.5f;
+    float distance = (radius / tanf(XMConvertToRadians(kPreviewFovDeg) * 0.5f)) * kPreviewCamMargin;
+
+    XMVECTOR cam_dir = XMVector3Normalize(XMVectorSet(kPreviewCamDirX, kPreviewCamDirY, kPreviewCamDirZ, 0.0f));
+    XMVECTOR eye     = XMVectorAdd(center, XMVectorScale(cam_dir, distance));
+
+    float near_clip = distance * 0.01f;
+    float far_clip  = distance * 10.0f;
+
+    XMMATRIX mView = XMMatrixLookAtLH(eye, center, XMVectorSet(0, 1, 0, 0));
     XMMATRIX mProj = XMMatrixPerspectiveFovLH(
-        XMConvertToRadians(kPreviewFovDeg), kPreviewAspect, kPreviewNearClip, kPreviewFarClip);
-    pMesh->Render(XMMatrixIdentity(), mView, mProj, kPreviewLightDir, kPreviewLightEye);
+        XMConvertToRadians(kPreviewFovDeg), kPreviewAspect, near_clip, far_clip);
+
+    XMFLOAT3 eye_f;
+    XMStoreFloat3(&eye_f, eye);
+    const VECTOR3 light_eye = VECTOR3(eye_f.x, eye_f.y, eye_f.z);
+    pMesh->Render(XMMatrixIdentity(), mView, mProj, kPreviewLightDir, light_eye);
 
     // 描画先とビューポートを元に戻す
     pD3D->SetRenderTarget(nullptr, nullptr);
@@ -198,13 +215,23 @@ void Button::DebugImGui()
     ImGui::Begin("Editor Tools");
 
     ImGui::Separator();
+    //モデルの読み込み
     ImGui::Text("Add Model");
     if (ImGui::Button("OpenModel"))
     {
-        std::string path = Platform::OpenFileDialog(L"*.mesh");
+
+        std::string path = Platform::OpenFileDialog(L"*.mesh;*.fbx");
         if (!path.empty())
         {
-            model_creator_->CreateModel(path);
+            // 拡張子で .mesh / .fbx を振り分ける
+            size_t dot = path.find_last_of('.');
+            std::string ext = (dot != std::string::npos) ? path.substr(dot) : "";
+            for (auto& c : ext) c = static_cast<char>(tolower(c));
+
+            if (ext == ".fbx")
+                model_creator_->ConvertAndLoad(path);
+            else
+                model_creator_->CreateModel(path);
         }
     }
     ImGui::Separator();
@@ -218,7 +245,6 @@ void Button::DebugImGui()
         }
     }
     ImGui::EndGroup();
-
     ImGui::Separator();
     ImGui::End();
 
@@ -227,11 +253,23 @@ void Button::DebugImGui()
         ImVec2(ImGui::GetIO().DisplaySize.x - kEditorToolsOffsetFromRight, kSettingWindowY));
     ImGui::Begin("Setting", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     bool flag = grid_draw_->GetDrawFlag();
-    ImGui::Checkbox("Grid", &flag);
+    if (ImGui::Checkbox("Grid", &flag))
+    {
+        grid_draw_->SetDrawFlag(flag);
+    }
     ImGui::Separator();
     if (ImGui::Button("Export"))
     {
         ObjectManager::FindGameObject<StageData>()->Export("example");
+    }
+    if (ImGui::Button("Import"))
+    {
+        std::string path = Platform::OpenFileDialog(L"*.json");
+        if (!path.empty())
+        {
+            Import importer;
+            importer.ImportFromFile(path);
+        }
     }
     ImGui::End();
 }
