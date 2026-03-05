@@ -6,6 +6,33 @@
 struct ImageButtonData;
 class CFbxMesh;
 
+namespace
+{
+    // プレビュー用カメラのパラメータ
+    constexpr float kPreviewCamEyeX   =  5.0f;
+    constexpr float kPreviewCamEyeY   =  5.0f;
+    constexpr float kPreviewCamEyeZ   = -8.0f;
+    constexpr float kPreviewFovDeg    = 45.0f;
+    constexpr float kPreviewAspect    =  1.0f;  // 正方形テクスチャなのでアスペクト比1
+    constexpr float kPreviewNearClip  =  0.1f;
+    constexpr float kPreviewFarClip   = 100.0f;
+
+    // プレビュー用ライト方向と視点位置（ライト計算用）
+    const VECTOR3 kPreviewLightDir = VECTOR3(0.5f, 1.0f, -1.0f);
+    const VECTOR3 kPreviewLightEye = VECTOR3(kPreviewCamEyeX, kPreviewCamEyeY, kPreviewCamEyeZ);
+
+    // プレビューのバックグラウンドカラー（暗めのグレー）
+    constexpr float kClearR = 0.12f;
+    constexpr float kClearG = 0.12f;
+    constexpr float kClearB = 0.12f;
+    constexpr float kClearA = 1.0f;
+
+    // UI ウィンドウのレイアウト定数
+    constexpr float kEditorToolsOffsetFromRight = 320.0f;  // 画面右端からの距離
+    constexpr float kEditorToolsWindowY         =  10.0f;
+    constexpr float kSettingWindowY             = 300.0f;
+}
+
 Button::Button()
 {
     world_position_ = VECTOR3(0.0f, 0.0f, 0.0f);
@@ -14,8 +41,8 @@ Button::Button()
     CModelStorage* storage = ObjectManager::FindGameObject<CModelStorage>();
     if (storage)
     {
-        AddButton("Plane", storage->GetModel("Plane"));
-        AddButton("Curve", storage->GetModel("Curve"));
+        AddButton("Plane",    storage->GetModel("Plane"));
+        AddButton("Curve",    storage->GetModel("Curve"));
         AddButton("GoalLine", storage->GetModel("GoalLine"));
     }
 
@@ -34,6 +61,7 @@ void Button::Update()
     DebugImGui();
 }
 
+// 指定IDのボタンをリストに追加する。メッシュが渡された場合はプレビューテクスチャを生成する
 void Button::AddButton(const std::string& button_ID, CFbxMesh* mesh, const ImVec2& size)
 {
     ImageButtonData data(button_ID, size);
@@ -48,7 +76,7 @@ void Button::AddButton(const std::string& button_ID, CFbxMesh* mesh, const ImVec
     image_buttons_.push_back(data);
 }
 
-// 全テクスチャの解放（isRenderTextureのものはスキップ）
+// isRenderTextureでないボタンのテクスチャをすべて解放してリストをクリアする
 void Button::ReleaseAllTextures()
 {
     for (auto& button : image_buttons_)
@@ -62,26 +90,24 @@ void Button::ReleaseAllTextures()
     image_buttons_.clear();
 }
 
-// CModelStorage のメッシュを借りて1回だけ描画し SRV に焼き付ける（メッシュは所有しない）
-// pMesh を受け取り、オフスクリーンの PREVIEW_SIZE x PREVIEW_SIZE テクスチャに1回だけ描画して
-// そのSRVをImGuiボタン用として返す。pMesh の所有権はここで取らない（CModelStorageが管理）。
+// メッシュをオフスクリーンに1回描画し、ImGuiボタン用のSRVを含むレンダーターゲットを返す
 ModelPreviewRT Button::CreateModelPreviewRT(CFbxMesh* pMesh)
 {
     ModelPreviewRT rt = {};
     if (!pMesh) return rt;
 
-    auto* pD3D = GameDevice()->m_pD3D;
+    auto* pD3D    = GameDevice()->m_pD3D;
     auto* pDevice = pD3D->m_pDevice;
-    auto* pCtx = pD3D->m_pDeviceContext;
+    auto* pCtx    = pD3D->m_pDeviceContext;
 
-    //共通設定
+    // テクスチャ共通設定
     D3D11_TEXTURE2D_DESC td = {};
     td.Width = td.Height = PREVIEW_SIZE;
     td.MipLevels = td.ArraySize = 1;
     td.SampleDesc.Count = 1;
 
-    //カラーテクスチャとビューの作成
-    td.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    // カラーテクスチャとビューの作成
+    td.Format    = DXGI_FORMAT_R8G8B8A8_UNORM;
     td.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
     ID3D11Texture2D* pTex = nullptr;
     pDevice->CreateTexture2D(&td, nullptr, &pTex);
@@ -89,39 +115,44 @@ ModelPreviewRT Button::CreateModelPreviewRT(CFbxMesh* pMesh)
     pDevice->CreateShaderResourceView(pTex, nullptr, &rt.pSRV);
     pTex->Release();
 
-    //深度バッファの作成
-    td.Format = DXGI_FORMAT_D32_FLOAT;
+    // 深度バッファの作成
+    td.Format    = DXGI_FORMAT_D32_FLOAT;
     td.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     pDevice->CreateTexture2D(&td, nullptr, &pTex);
     pDevice->CreateDepthStencilView(pTex, nullptr, &rt.pDSV);
     pTex->Release();
 
-    //現在のビューポートの保存
+    // 現在のビューポートを保存（描画後に復元するため）
     D3D11_VIEWPORT oldVP;
     UINT numVP = 1;
     pCtx->RSGetViewports(&numVP, &oldVP);
 
-    //プレビュー用ビューポートの設定
+    // プレビュー用にビューポートを PREVIEW_SIZE の正方形に設定
     D3D11_VIEWPORT vp = {0, 0, static_cast<float>(PREVIEW_SIZE), static_cast<float>(PREVIEW_SIZE), 0.0f, 1.0f};
     pCtx->RSSetViewports(1, &vp);
 
-    //レンダリングターゲットの設定とクリア
+    // レンダリングターゲットの設定とクリア
     pD3D->SetRenderTarget(rt.pRTV, rt.pDSV);
-    float clearColor[4] = {0.12f, 0.12f, 0.12f, 1.0f};
+    float clearColor[4] = {kClearR, kClearG, kClearB, kClearA};
     pD3D->ClearRenderTarget(clearColor);
 
-    //行列の計算とメッシュの描画
-    XMMATRIX mView = XMMatrixLookAtLH(XMVectorSet(5, 5, -8, 0), XMVectorZero(), XMVectorSet(0, 1, 0, 0));
-    XMMATRIX mProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), 1, 0.1f, 100);
-    pMesh->Render(XMMatrixIdentity(), mView, mProj, VECTOR3(0.5f, 1, -1), VECTOR3(5, 5, -8));
+    // プレビュー用ビュー・プロジェクション行列を構築してメッシュを描画
+    XMMATRIX mView = XMMatrixLookAtLH(
+        XMVectorSet(kPreviewCamEyeX, kPreviewCamEyeY, kPreviewCamEyeZ, 0),
+        XMVectorZero(),
+        XMVectorSet(0, 1, 0, 0));
+    XMMATRIX mProj = XMMatrixPerspectiveFovLH(
+        XMConvertToRadians(kPreviewFovDeg), kPreviewAspect, kPreviewNearClip, kPreviewFarClip);
+    pMesh->Render(XMMatrixIdentity(), mView, mProj, kPreviewLightDir, kPreviewLightEye);
 
-    //描画先とビューポートを元に戻す
+    // 描画先とビューポートを元に戻す
     pD3D->SetRenderTarget(nullptr, nullptr);
     pCtx->RSSetViewports(1, &oldVP);
 
     return rt;
 }
 
+// 全モデルプレビューのD3Dリソースを解放してリストをクリアする
 void Button::ReleaseModelPreviews()
 {
     for (auto& rt : model_previews_)
@@ -131,11 +162,12 @@ void Button::ReleaseModelPreviews()
     model_previews_.clear();
 }
 
-// 画像ボタンの作成
+// ImageButtonDataの内容に応じてImGuiのボタンを1つ描画する
 void Button::CreateImageButton(const ImageButtonData& buttonData)
 {
     if (buttonData.isLoaded && buttonData.pTexture)
     {
+        // プレビューテクスチャがある場合は画像ボタンとして描画
         ImGui::PushID(buttonData.buttonID.c_str());
         if (ImGui::ImageButton((ImTextureID)buttonData.pTexture, buttonData.size))
             HandleButtonClick(buttonData.buttonID);
@@ -143,22 +175,26 @@ void Button::CreateImageButton(const ImageButtonData& buttonData)
     }
     else
     {
+        // テクスチャがない場合はテキストボタンにフォールバック
         if (ImGui::Button(buttonData.buttonID.c_str(), buttonData.size))
             HandleButtonClick(buttonData.buttonID);
     }
 }
 
-// ボタンクリック時の処理
+// ボタンがクリックされたとき、対応モデルを原点にステージへ追加する
 void Button::HandleButtonClick(const std::string& buttonID)
 {
     VECTOR3 init_pos = {0, 0, 0};
     ObjectManager::FindGameObject<StageData>()->AddModel(init_pos, buttonID);
 }
 
-// ImGuiでの表示
+// エディタUIのImGuiウィンドウ（モデル追加・エクスポート・グリッド設定）を描画する
 void Button::DebugImGui()
 {
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 10), ImGuiCond_FirstUseEver);
+    // モデル追加・ボタン一覧ウィンドウ（画面右端に固定）
+    ImGui::SetNextWindowPos(
+        ImVec2(ImGui::GetIO().DisplaySize.x - kEditorToolsOffsetFromRight, kEditorToolsWindowY),
+        ImGuiCond_FirstUseEver);
     ImGui::Begin("Editor Tools");
 
     ImGui::Separator();
@@ -177,6 +213,7 @@ void Button::DebugImGui()
         for (size_t i = 0; i < image_buttons_.size(); i++)
         {
             CreateImageButton(image_buttons_[i]);
+            // 最後のボタン以外は横並びにする
             if (i < image_buttons_.size() - 1) ImGui::SameLine();
         }
     }
@@ -184,10 +221,13 @@ void Button::DebugImGui()
 
     ImGui::Separator();
     ImGui::End();
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300));
-    ImGui::Begin("Setting", nullptr,ImGuiWindowFlags_AlwaysAutoResize);
-    bool flag = grid_draw_->GetDrawFlag() ;
-    ImGui::Checkbox("Grid", &flag); 
+
+    // 設定ウィンドウ（グリッド表示切替・エクスポート）
+    ImGui::SetNextWindowPos(
+        ImVec2(ImGui::GetIO().DisplaySize.x - kEditorToolsOffsetFromRight, kSettingWindowY));
+    ImGui::Begin("Setting", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    bool flag = grid_draw_->GetDrawFlag();
+    ImGui::Checkbox("Grid", &flag);
     ImGui::Separator();
     if (ImGui::Button("Export"))
     {

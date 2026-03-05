@@ -6,6 +6,7 @@ CTranslation::CTranslation()
     InitMeshes();
     transform.scale = VECTOR3(5,5,5);
 }
+// X/Y/Z軸の移動ギズモメッシュとコライダーを初期化する
 void CTranslation::InitMeshes()
 {
     auto InitMesh = [](Info& info, const char* path)

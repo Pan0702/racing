@@ -12,6 +12,7 @@ struct ModelPreviewRT
     ID3D11DepthStencilView*   pDSV = nullptr;
     ID3D11ShaderResourceView* pSRV = nullptr; // ImGuiに渡す
 
+    /// <summary>保持しているD3Dリソースをすべて解放する</summary>
     void Release()
     {
         if (pRTV) { pRTV->Release(); pRTV = nullptr; }
@@ -38,7 +39,7 @@ struct ImageButtonData
 
 class Button : public Object3D
 {
-    
+
 private:
     VECTOR3 world_position_;
     std::vector<ImageButtonData> image_buttons_;
@@ -49,17 +50,41 @@ public:
     Button();
     ~Button();
     void Update() override;
+
+    /// <summary>指定IDのボタンをリストに追加する。メッシュが渡された場合はプレビューテクスチャを生成する</summary>
+    /// <param name="button_ID">ボタンの識別ID（モデル名）</param>
+    /// <param name="mesh">プレビュー用メッシュ（省略可）</param>
+    /// <param name="size">ボタンサイズ（デフォルト64x64）</param>
     void AddButton(const std::string& button_ID, CFbxMesh* mesh = nullptr,const ImVec2& size = ImVec2(64, 64));
 
 private:
+    /// <summary>初期ボタン群を生成する（未使用）</summary>
     void InitializeButtons();
+
+    /// <summary>isRenderTextureでないボタンのテクスチャをすべて解放してリストをクリアする</summary>
     void ReleaseAllTextures();
+
+    /// <summary>ImageButtonDataの内容に応じてImGuiのボタンを1つ描画する</summary>
+    /// <param name="buttonData">描画するボタンのデータ</param>
     void CreateImageButton(const ImageButtonData& buttonData);
+
+    /// <summary>ボタンがクリックされたとき、対応モデルをステージに追加する</summary>
+    /// <param name="buttonID">クリックされたボタンのID</param>
     void HandleButtonClick(const std::string& buttonID);
+
+    /// <summary>エディタUIのImGuiウィンドウ（モデル追加・エクスポート・グリッド設定）を描画する</summary>
     void DebugImGui();
 
     // pMesh は CModelStorage が所有するので delete しない
+    /// <summary>
+    /// メッシュをオフスクリーンに1回描画し、ImGuiボタン用のSRVを返す
+    /// メッシュの所有権はCModelStorageが持つため、ここではdeleteしない
+    /// </summary>
+    /// <param name="pMesh">描画するメッシュ</param>
+    /// <returns>生成したレンダーターゲット情報</returns>
     static ModelPreviewRT CreateModelPreviewRT(CFbxMesh* pMesh);
+
+    /// <summary>全モデルプレビューのD3Dリソースを解放してリストをクリアする</summary>
     void ReleaseModelPreviews();
 
 

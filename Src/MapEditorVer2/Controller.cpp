@@ -5,6 +5,18 @@
 #include "StageData.h"
 #include "TRSObject/TRS.h"
 
+namespace
+{
+    // Transform ウィンドウの初期位置とサイズ
+    constexpr float kTransformWindowX    = 10.0f;
+    constexpr float kTransformWindowY    = 10.0f;
+    constexpr float kTransformWindowW    = 300.0f;
+    constexpr float kTransformWindowH    = 160.0f;
+
+    // DragFloat3 の1フレームあたりの変化量
+    constexpr float kDragSpeed = 0.1f;
+}
+
 Controller::Controller()
 {
     camera_ = ObjectManager::FindGameObject<Camera>();
@@ -17,7 +29,7 @@ Controller::Controller()
 
 void Controller::Update()
 {
-    //カメラの移動処理
+    // 右クリック中はカメラ操作を優先し、TRS 操作は無効
     if (input_->CheckMouse(KD_DAT, DIM_RBUTTON))
     {
         CameraControl();
@@ -26,10 +38,12 @@ void Controller::Update()
     {
         if (is_catch)
         {
+            // オブジェクト選択中のみキーによるモード切替を受け付ける
             TRSControl();
         }
         else
         {
+            // 未選択時はギズモを非表示にする
             trs_->SetState(TRS::State::kNone);
         }
     }
@@ -41,16 +55,17 @@ void Controller::Update()
 
     if (is_catch)
     {
+        // BackSpace / Delete でオブジェクト削除
         bool is_delete = input_->CheckKey(KD_DAT, DIK_BACK) || input_->CheckKey(KD_DAT, DIK_DELETE);
         if (is_delete)
         {
             stage_data_->DeleteModel();
         }
+        // 左クリック離し時にドラッグを解除
         if (input_->CheckMouse(KD_UTRG, DIM_LBUTTON))
         {
             trs_->SetDraggingAxis(Axis::None);
         }
-
     }
 
     // クリックした瞬間
@@ -62,18 +77,21 @@ void Controller::Update()
     HandleUndoRedo();
 }
 
+// 左クリック時にTRSギズモまたはステージオブジェクトへのレイ判定を行う
 void Controller::HandleLeftClick()
 {
     Ray ray = MouseRay::Create();
 
+    // ギズモへのクリックを優先判定。当たった場合はオブジェクト選択判定を行わない
     Axis a = trs_->RayHitTest(ray);
     if (a != Axis::None)
     {
-        undo_manager_->Push();
+        undo_manager_->Push();      // ドラッグ開始前に現状態を保存
         trs_->SetDraggingAxis(a);
         return;
     }
 
+    // ギズモに当たらなかった場合はステージオブジェクトの選択判定
     MeshCollider::CollInfo hit;
     int index = stage_data_->RayHitTest(ray, &hit);
     if (index >= 0)
@@ -87,6 +105,7 @@ void Controller::HandleLeftClick()
     }
 }
 
+// Ctrl+Z/Ctrl+YでUndo/Redoを実行する
 void Controller::HandleUndoRedo()
 {
     if (input_->CheckKey(KD_DAT, DIK_LCONTROL))
@@ -96,6 +115,7 @@ void Controller::HandleUndoRedo()
     }
 }
 
+// W/E/R/Qキーでアクティブなギズモモードを切り替える
 void Controller::TRSControl() const
 {
     if (input_->CheckKey(KD_TRG, DIK_W))
@@ -119,6 +139,7 @@ void Controller::TRSControl() const
     }
 }
 
+// 右クリック中のマウス移動・キー入力でカメラを操作する
 void Controller::CameraControl() const
 {
     //回転
@@ -138,14 +159,14 @@ void Controller::Draw()
     Transform* t = stage_data_ ? stage_data_->GetSelectedTransform() : nullptr;
     if (not t) return;
     if (not is_catch)return;
-    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(300, 160), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(kTransformWindowX, kTransformWindowY), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(kTransformWindowW, kTransformWindowH), ImGuiCond_Once);
     ImGui::Begin("Transform");
 
     ImGui::Separator();
     ImGui::Text("Position: %.2f, %.2f, %.2f", t->position.x,
                 t->position.y, t->position.z);
-    if (ImGui::DragFloat3("Position", &t->position.x, 0.1f))
+    if (ImGui::DragFloat3("Position", &t->position.x, kDragSpeed))
     {
     }
     if (ImGui::IsItemActivated())
@@ -156,7 +177,7 @@ void Controller::Draw()
     VECTOR3& tmp_r = t->rotation;
     ImGui::Text("Rotation: %.2f, %.2f, %.2f", tmp_r.x,
                 tmp_r.y, tmp_r.z);
-    if (ImGui::DragFloat3("Rotation", &tmp_r.x, 0.1f))
+    if (ImGui::DragFloat3("Rotation", &tmp_r.x, kDragSpeed))
     {
     }
     if (ImGui::IsItemActivated())
@@ -166,7 +187,7 @@ void Controller::Draw()
     ImGui::Separator();
     ImGui::Text("Scale:    %.2f, %.2f, %.2f", t->scale.x,
                 t->scale.y, t->scale.z);
-    if (ImGui::DragFloat3("Scale", &t->scale.x, 0.1f))
+    if (ImGui::DragFloat3("Scale", &t->scale.x, kDragSpeed))
     {
     }
     if (ImGui::IsItemActivated())

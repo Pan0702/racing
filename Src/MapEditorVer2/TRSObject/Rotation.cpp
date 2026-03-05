@@ -6,6 +6,7 @@ CRotation::CRotation()
     InitMeshes();
 }
 
+// X/Y/Z軸の回転ギズモメッシュとコライダーを初期化する
 void CRotation::InitMeshes()
 {
     auto InitMesh = [](Info& info, const char* path)
@@ -21,8 +22,6 @@ void CRotation::InitMeshes()
 }
 
 
-CRotation::~CRotation()
-{
-}
+CRotation::~CRotation() = default;
 
 

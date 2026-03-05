@@ -8,8 +8,11 @@ private:
 
 private:
     void Draw() override;
+
+    /// <summary>XZ平面にグリッド線を描画する。10マスごとに線を太く表示する</summary>
     static void Grid();
 
 public:
+    /// <summary>グリッド描画フラグの現在値を返す</summary>
     bool GetDrawFlag() const { return is_grid_draw_; }
 };

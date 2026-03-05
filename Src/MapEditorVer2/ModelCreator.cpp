@@ -5,6 +5,7 @@
 #include "../ModelStorage.h"
 #include "../ObjectManager.h"
 
+// 指定パスのメッシュをロードし、ボタンリストとモデルストレージに登録する
 void ModelCreator::CreateModel(const std::string& path)
 {
     size_t last_slash = path.find_last_of("\\/");

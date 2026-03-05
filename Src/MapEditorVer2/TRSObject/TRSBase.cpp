@@ -10,6 +10,7 @@ TRSBase::~TRSBase()
 {
 }
 
+// X/Y/Z軸のギズモメッシュをすべて描画する
 void TRSBase::Render()
 {
         
@@ -27,11 +28,13 @@ void TRSBase::Render()
     }
 }
 
+// ギズモの表示位置を指定座標に設定する
 void TRSBase::SetPosition(const VECTOR3& pos)
 {
     transform.position = pos;
 }
 
+// レイとX/Y/Zギズモのコライダーを判定し、当たった軸を返す
 Axis TRSBase::RayHitTest(const Ray& ray, float length)
 {
     VECTOR3 to  = ray.origin + ray.direction * length;

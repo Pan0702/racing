@@ -1,6 +1,12 @@
 #include "TRS.h"
 #include "../stageData.h"
 
+namespace
+{
+    // スクリーン上の軸ベクトルがほぼゼロのとき除算を防ぐしきい値
+    constexpr float kAxisScreenLenEpsilon = 0.000001f;
+}
+
 TRS::TRS()
 {
     translation_ = std::make_unique<CTranslation>();
@@ -10,6 +16,7 @@ TRS::TRS()
     new TRSBase();
 }
 
+// 現在のモードに応じたギズモとレイの当たり判定を行い、当たった軸を返す
 Axis TRS::RayHitTest(const Ray& ray)
 {
     switch (state_)
@@ -33,6 +40,7 @@ void TRS::Update()
     scaling_->SetPosition(t->position);
 }
 
+// ドラッグ中の軸に沿って選択オブジェクトのTransformを更新する
 void TRS::SetTransform()
 {
     if (dragging_axis_ == Axis::None) return;
@@ -42,7 +50,7 @@ void TRS::SetTransform()
 
     float delta = AddTransform(dragging_axis_, t->position);
 
-    // 軸を VECTOR3 参照で取得
+    // ドラッグ軸に対応する VECTOR3 の成分（x/y/z）を参照で返すラムダ
     auto getComponent = [&](VECTOR3& vec) -> float&
     {
         if (dragging_axis_ == Axis::X) return vec.x;
@@ -54,19 +62,25 @@ void TRS::SetTransform()
     switch (state_)
     {
     case kTranslation:
+        // スナップ単位に丸めて移動
         SnapTranslation(getComponent(t->position), delta);
         break;
-    case kRotation: 
+    case kRotation:
+        // スナップ単位に丸めて回転
         SnapRotation(getComponent(t->rotation) , delta );
         break;
-    case kScaling: getComponent(t->scale) += delta * scale_speed_;
+    case kScaling:
+        // スケールはスナップなしで直接加算
+        getComponent(t->scale) += delta * scale_speed_;
         break;
     default: break;
     }
 }
 
+// 移動量をスナップ単位に丸めてcompoに累積加算する
 void TRS::SnapTranslation(float& compo, float delta)
 {
+    // フレームごとの delta を累積し、スナップ幅 step を超えるたびに step 単位で確定
     translate_accum_ += delta;
     float step = translate_speed_;
     if (step > 0.0f)
@@ -84,8 +98,10 @@ void TRS::SnapTranslation(float& compo, float delta)
     }
 }
 
+// 回転量をスナップ単位に丸めてcompoに累積加算する
 void TRS::SnapRotation(float& compo, float delta)
 {
+    // フレームごとの delta を累積し、スナップ幅 step を超えるたびに step 単位で確定
     rotate_accum_ += delta;
     float step = rotate_speed_;
     if (step > 0.0f)
@@ -103,6 +119,7 @@ void TRS::SnapRotation(float& compo, float delta)
     }
 }
 
+// マウス移動量を指定軸のスクリーン投影ベクトルに射影し、ワールド空間の変化量を返す
 float TRS::AddTransform(Axis axis, const VECTOR3& objPos)
 {
     auto device = GameDevice();
@@ -142,7 +159,7 @@ float TRS::AddTransform(Axis axis, const VECTOR3& objPos)
     float sx = p2.x - p1.x;
     float sy = p2.y - p1.y;
     float lenSq = sx * sx + sy * sy;
-    if (lenSq < 0.000001f) return 0.0f;
+    if (lenSq < kAxisScreenLenEpsilon) return 0.0f;
 
     // マウス移動をスクリーン軸方向に射影 (projected/len) / len = dot / lenSq
     float dot = static_cast<float>(mouse.lX) * sx + static_cast<float>(mouse.lY) * sy;
@@ -168,6 +185,7 @@ void TRS::Draw()
 }
 
 
+// ImGuiでTRSモード切替と各設定UIをまとめて描画する
 void TRS::DrawImGui()
 {
     ImGui::Begin("MoveAmount", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
@@ -203,6 +221,7 @@ void TRS::DrawImGui()
 }
 
 
+// ImGuiで移動スナップ量を選択するラジオボタンを描画する
 void TRS::RadioTranslate()
 {
     ImGui::Text("Translation");
@@ -232,6 +251,7 @@ void TRS::RadioTranslate()
     }
 }
 
+// ImGuiで回転スナップ量を選択するラジオボタンを描画する
 void TRS::RadioRotate()
 {
     ImGui::Text("Rotation");
@@ -265,6 +285,7 @@ void TRS::RadioRotate()
     }
 }
 
+// ImGuiでスケールスピードを選択するラジオボタンを描画する
 void TRS::RadioScale()
 {
     ImGui::Text("Scaling");

@@ -5,6 +5,7 @@ CScaling::CScaling()
     InitMeshes();
 }
 
+// X/Y/Z軸のスケールギズモメッシュとコライダーを初期化する
 void CScaling::InitMeshes()
 {
     auto InitMesh = [](Info& info, const char* path)

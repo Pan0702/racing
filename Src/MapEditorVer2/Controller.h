@@ -16,12 +16,20 @@ private:
 private:
     void Update() override;
     void Draw() override;
+
+    /// <summary>W/E/R/Qキーでアクティブなギズモモードを切り替える</summary>
     void TRSControl() const;
+
+    /// <summary>右クリック中のマウス移動・キー入力でカメラを操作する</summary>
     void CameraControl() const;
+
+    /// <summary>左クリック時にTRSギズモまたはステージオブジェクトへのレイ判定を行う</summary>
     void HandleLeftClick();
+
+    /// <summary>Ctrl+Z/Ctrl+YでUndo/Redoを実行する</summary>
     void HandleUndoRedo();
 public:
     Controller();
     ~Controller() = default;
-    
+
 };

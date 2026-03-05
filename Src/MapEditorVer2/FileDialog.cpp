@@ -4,6 +4,7 @@
 
 namespace Platform
 {
+    // ファイルオープンダイアログを表示し、選択されたファイルのパスをUTF-8で返す
     std::string OpenFileDialog(const wchar_t* filter)
     {
         std::string result;

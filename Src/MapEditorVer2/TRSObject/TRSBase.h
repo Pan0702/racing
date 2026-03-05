@@ -18,12 +18,23 @@ protected:
     Info z_info_;
 
 public:
+    /// <summary>ギズモの表示位置を指定座標に設定する</summary>
+    /// <param name="pos">設定するワールド座標</param>
     virtual void SetPosition(const VECTOR3& pos);
+
+    /// <summary>ドラッグ中の軸に沿ってオブジェクトのTransformを更新する</summary>
     void SetTransform();
 
 public:
     TRSBase();
     ~TRSBase();
+
+    /// <summary>X/Y/Z軸のギズモメッシュをすべて描画する</summary>
     virtual void Render();
+
+    /// <summary>レイとX/Y/Zギズモのコライダーを判定し、当たった軸を返す</summary>
+    /// <param name="ray">判定に使用するレイ</param>
+    /// <param name="length">レイの長さ（デフォルト1000）</param>
+    /// <returns>当たった軸（X/Y/Z）、当たらなければNone</returns>
     Axis RayHitTest(const Ray& ray, float length = 1000.0f);
 };
