@@ -1,9 +1,9 @@
 #pragma once
-#include <array>
 #include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "../../MyMath.h"
 
 // .mesh ファイルの頂点構造体（stride = 32 bytes）
 struct MeshVertex
@@ -82,23 +82,19 @@ private:
     /// </summary>
     int64_t ReadNodeId(uint64_t offset) const;
 
-    static std::array<float, 16> MatMul(
-        const std::array<float, 16>& a,
-        const std::array<float, 16>& b);
-    
     /// <summary>
     /// Model ノードからグローバル変換行列 (親チェーンを再帰的に結合) を取得する。
     /// 行優先 4x4、Euler 回転順序は FBX 標準の XYZ。
     /// model が nullptr の場合は単位行列を返す。
     /// </summary>
-    std::array<float, 16> GetGlobalMatrix(Node* model) const;
+    MATRIX4X4 GetGlobalMatrix(Node* model) const;
 
     /// <summary>
     /// Model ノードからローカル変換行列 (TRS) を取得する。
     /// 行優先 4x4、Euler 回転順序は FBX 標準の XYZ。
     /// model が nullptr の場合は単位行列を返す。
     /// </summary>
-    std::array<float, 16> GetLocalMatrix(Node* model) const;
+    MATRIX4X4 GetLocalMatrix(Node* model) const;
 
     // バイナリデータから型 T の値を読み込む
     template<typename T>

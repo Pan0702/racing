@@ -5,15 +5,6 @@
 
 using json = nlohmann::json;
 
-namespace
-{
-    // JSON ファイルの出力先ディレクトリ
-    constexpr auto kOutputDir  = "data/";
-
-    // JSON ダンプ時のインデント幅（スペース数）
-    constexpr int  kJsonIndent = 4;
-}
-
 // モデル名とTransformをJSONオブジェクトに変換して返す
 json ExportData::TransformToJson(const std::string& model_name, const Transform& transform)
 {
@@ -31,21 +22,22 @@ json ExportData::TransformToJson(const std::string& model_name, const Transform&
 }
 
 // ステージ上の全オブジェクトをJSON配列にシリアライズしてファイルに書き出す
-void ExportData::ExportAllModels(const std::string& filename,
-                                 const std::vector<StageDataInfo>& modelList)
+void ExportData::ExportAllModels(const std::string& file_name,
+                                 const std::vector<StageDataInfo>& model_list)
 {
     json root = json::array(); // 全体を配列として定義
 
-    for (const auto& item : modelList)
+    for (const auto& item : model_list)
     {
-        root.push_back(TransformToJson(item.model_name, item.transform));
+        root.push_back(TransformToJson(item.model_name_, item.transform_));
     }
-
-    std::string path = kOutputDir + filename + ".json";
-    std::ofstream file(path);
+    
+    std::ofstream file(file_name);
     if (file.is_open())
     {
+        // JSON ダンプ時のインデント幅（スペース数）
+        constexpr int  kJsonIndent = 4;
         file << root.dump(kJsonIndent); // インデント付きで見やすく保存
     }
-    MessageBox(0, _T("Export Success"), nullptr, MB_OK);
+    MessageBox(nullptr, _T("Export Success"), nullptr, MB_OK);
 }

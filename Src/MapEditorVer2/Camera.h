@@ -8,7 +8,7 @@ public:
     void Update() override;
 
     /// <summary>選択オブジェクトにカメラをフォーカスする</summary>
-    void Focus();
+    static void Focus();
 
     /// <summary>WASDキーでカメラを前後左右に平行移動する</summary>
     static void Move();

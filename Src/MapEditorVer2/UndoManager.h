@@ -9,6 +9,7 @@ private:
     {
         int index;
         Transform trans;
+        std::string model_name;
     };
     std::stack<UndoState> undo_stack_;
     std::stack<UndoState> redo_stack_;
@@ -21,6 +22,7 @@ public:
 
     /// <summary>現在選択中のオブジェクトのTransformをUndoスタックに積む</summary>
     void Push();
+    void DeleteObjectPush();
 
     /// <summary>直前の操作を取り消し、Redoスタックに現在状態を退避する</summary>
     void Undo();

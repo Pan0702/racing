@@ -3,6 +3,7 @@
 
 #include "GridDraw.h"
 #include "ModelCreator.h"
+#include "StageData.h"
 #include "../Object3D.h"
 
 static constexpr int PREVIEW_SIZE = 128;
@@ -48,6 +49,7 @@ private:
     std::vector<ModelPreviewRT>  model_previews_;
     ModelCreator* model_creator_;
     GridDraw* grid_draw_;
+    StageData* data_;
     int select_id;
     
 

@@ -13,14 +13,23 @@ void StageData::AddModel(const VECTOR3& pos, const std::string& model_name)
 {
     StageDataInfo info(model_name, pos);
     stage_data_.push_back(info);
+    selected_model_ = stage_data_.size() - 1;
+}
+
+// 指定Transformとモデル名でオブジェクトをステージに追加する
+void StageData::AddModel(const Transform& t, const std::string& model_name)
+{
+    StageDataInfo info(model_name, t);
+    stage_data_.push_back(info);
+    selected_model_ = stage_data_.size() - 1;
 }
 
 // Transform全体を指定してオブジェクトをステージに追加する（インポート用）
 void StageData::AddModelWithTransform(const std::string& model_name, const Transform& transform)
 {
     StageDataInfo info;
-    info.model_name = model_name;
-    info.transform  = transform;
+    info.model_name_ = model_name;
+    info.transform_  = transform;
     stage_data_.push_back(info);
 }
 
@@ -41,11 +50,11 @@ int StageData::RayHitTest(const Ray& ray,MeshCollider::CollInfo* collOut)
     // 全オブジェクトを走査して当たり判定を行い、最もレイ始点に近いものを選ぶ
     for (int i = 0; i < stage_data_.size(); i++)
     {
-        MeshCollider* coll = model_storage_->GetCollider(stage_data_[i].model_name);
+        MeshCollider* coll = model_storage_->GetCollider(stage_data_[i].model_name_);
         if (coll == nullptr) continue;
 
         MeshCollider::CollInfo info;
-        MATRIX4X4 mat = stage_data_[i].transform.matrix();
+        MATRIX4X4 mat = stage_data_[i].transform_.matrix();
         if (coll->CheckCollisionLine(mat,ray.origin,to,&info))
         {
             // 距離の二乗で比較（sqrt不要のため高速）
@@ -66,16 +75,21 @@ void StageData::DeleteModel()
 {
     if (stage_data_.empty())return;
     stage_data_.erase(stage_data_.begin() + selected_model_);
+    selected_model_ = -1;
 }
 
 
-
+void StageData::DeleteModel(int index)
+{
+    if (stage_data_.empty())return;
+    stage_data_.erase(stage_data_.begin() + index);
+}
 
 void StageData::Draw()
 {
     for (auto& data : stage_data_) {
-        CFbxMesh* mesh = model_storage_->GetModel(data.model_name);
-        mesh->Render(data.transform.matrix());
+        CFbxMesh* mesh = model_storage_->GetModel(data.model_name_);
+        mesh->Render(data.transform_.matrix());
     }
 }
 
@@ -92,8 +106,19 @@ void StageData::SetModel(int index)
     selected_model_ = index;
 }
 
+void StageData::CopyModel(int index)
+{
+    if (index < 0 || index >= stage_data_.size()) return;
+    StageDataInfo info;
+    info.model_name_ = stage_data_[index].model_name_;
+    info.transform_ = stage_data_[index].transform_;
+    info.transform_.position.z += 5;
+    stage_data_.push_back(info);
+    selected_model_ = stage_data_.size() - 1;
+}
+
 // 現在選択中のオブジェクトインデックスを返す
-int StageData::GetIndex() const
+int StageData::GetSelectIndex() const
 {
     return selected_model_;
 }
@@ -107,11 +132,11 @@ const std::vector<StageDataInfo>& StageData::GetStageDataInfo() const
 Transform* StageData::GetSelectedTransform()
 {
     if (selected_model_ < 0 || selected_model_ >= stage_data_.size()) return nullptr;
-    return &stage_data_[selected_model_].transform;
+    return &stage_data_[selected_model_].transform_;
 }
 
 // 指定インデックスのオブジェクトのTransformを上書きする（Undo/Redo用）
 void StageData::SetSelectedTransform(int index, const Transform& transform)
 {
-    stage_data_[index].transform = transform;
+    stage_data_[index].transform_ = transform;
 }

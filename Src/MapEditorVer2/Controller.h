@@ -12,7 +12,9 @@ private:
     CDirectInput* input_;
     UndoManager* undo_manager_;
     StageData* stage_data_;
-    bool is_catch = false;
+    bool is_catch_ = false;
+    int copy_object_index_ = -1;
+
 private:
     void Update() override;
     void Draw() override;
@@ -27,9 +29,11 @@ private:
     void HandleLeftClick();
 
     /// <summary>Ctrl+Z/Ctrl+YでUndo/Redoを実行する</summary>
-    void HandleUndoRedo();
+    void HandleUndoRedo() const;
+
 public:
     Controller();
     ~Controller() = default;
-
+    
+    void SetCatchFlag(bool f);
 };

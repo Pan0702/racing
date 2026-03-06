@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Object3D.h"
 #include "../MouseRay.h"
+#include <d3d11.h>
 
 enum class Axis { None, X, Y, Z };
 
@@ -17,13 +18,17 @@ protected:
     Info y_info_;
     Info z_info_;
 
+private:
+    ID3D11DepthStencilState* depth_off_state_ = nullptr;
+
 public:
     /// <summary>ギズモの表示位置を指定座標に設定する</summary>
     /// <param name="pos">設定するワールド座標</param>
     virtual void SetPosition(const VECTOR3& pos);
 
-    /// <summary>ドラッグ中の軸に沿ってオブジェクトのTransformを更新する</summary>
-    void SetTransform();
+    /// <summary>カメラ距離に比例してギズモのスケールを更新し、常に同じ見かけサイズにする</summary>
+    /// <param name="cam_pos">カメラのワールド座標</param>
+    void UpdateScaleByCamera(const VECTOR3& cam_pos);
 
 public:
     TRSBase();
@@ -31,6 +36,7 @@ public:
 
     /// <summary>X/Y/Z軸のギズモメッシュをすべて描画する</summary>
     virtual void Render();
+    
 
     /// <summary>レイとX/Y/Zギズモのコライダーを判定し、当たった軸を返す</summary>
     /// <param name="ray">判定に使用するレイ</param>

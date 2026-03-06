@@ -9,5 +9,5 @@ public:
     /// 未ロードのモデルは自動的にロードしてボタンにも追加する。
     /// </summary>
     /// <param name="path">インポートするJSONファイルのパス</param>
-    void ImportFromFile(const std::string& path);
+    static void ImportFromFile(const std::string& path);
 };

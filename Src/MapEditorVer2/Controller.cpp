@@ -26,71 +26,95 @@ Controller::Controller()
     undo_manager_ = new UndoManager();
 }
 
+void Controller::SetCatchFlag(bool f)
+{
+    is_catch_ = f;
+}
+
 
 void Controller::Update()
 {
-    // 右クリック中はカメラ操作を優先し、TRS 操作は無効
-    if (input_->CheckMouse(KD_DAT, DIM_RBUTTON))
+    const ImGuiIO& io = ImGui::GetIO();
+
+    if (!io.WantCaptureMouse)
     {
-        CameraControl();
-    }
-    else
-    {
-        if (is_catch)
+        // 右クリック中はカメラ操作を優先し、TRS 操作は無効
+        if (input_->CheckMouse(KD_DAT, DIM_RBUTTON))
         {
-            // オブジェクト選択中のみキーによるモード切替を受け付ける
-            TRSControl();
+            CameraControl();
         }
         else
         {
-            // 未選択時はギズモを非表示にする
-            trs_->SetState(TRS::State::kNone);
+            if (is_catch_)
+            {
+                // オブジェクト選択中のみキーによるモード切替を受け付ける
+                TRSControl();
+            }
+            else
+            {
+                // 未選択時はギズモを非表示にする
+                trs_->SetState(TRS::State::kNone);
+            }
         }
-    }
 
-    if (input_->GetMouseWheel() != 0)
-    {
-        camera_->Zoom();
-    }
-    
-    //オブジェクトをズーム
-    if (input_->CheckKey(KD_TRG, DIK_F))
-    {
-        camera_->Focus();
-    }
-    
-    
-    if (is_catch)
-    {
-        // BackSpace / Delete でオブジェクト削除
-        bool is_delete = input_->CheckKey(KD_TRG, DIK_BACK) || input_->CheckKey(KD_TRG, DIK_DELETE);
-        if (is_delete)
+        if (input_->GetMouseWheel() != 0)
         {
-            stage_data_->DeleteModel();
+            Camera::Zoom();
         }
+
+        // クリックした瞬間
+        if (input_->CheckMouse(KD_TRG, DIM_LBUTTON))
+        {
+            HandleLeftClick();
+        }
+
         // 左クリック離し時にドラッグを解除
-        if (input_->CheckMouse(KD_UTRG, DIM_LBUTTON))
+        if (is_catch_ && input_->CheckMouse(KD_UTRG, DIM_LBUTTON))
         {
             trs_->SetDraggingAxis(Axis::None);
         }
     }
 
-    // クリックした瞬間（ImGui がマウスを使っている場合はスキップ）
-    if (input_->CheckMouse(KD_TRG, DIM_LBUTTON) && !ImGui::GetIO().WantCaptureMouse)
+    if (!io.WantCaptureKeyboard)
     {
-        HandleLeftClick();
-    }
+        if (input_->CheckKey(KD_TRG, DIK_F))
+        {
+            Camera::Focus();
+        }
 
-    HandleUndoRedo();
+        if (is_catch_)
+        {
+            // BackSpace / Delete でオブジェクト削除
+            bool is_delete = input_->CheckKey(KD_TRG, DIK_BACK) || input_->CheckKey(KD_TRG, DIK_DELETE);
+            if (is_delete)
+            {
+                trs_->SetState(TRS::State::kNone);
+                undo_manager_->DeleteObjectPush();
+                stage_data_->DeleteModel();
+                is_catch_ = false;
+            }
+        }
+
+        if (input_->CheckKey(KD_TRG, DIK_C) && input_->CheckKey(KD_DAT, DIK_LCONTROL))
+        {
+            copy_object_index_ = stage_data_->GetSelectIndex();
+        }
+        if (input_->CheckKey(KD_TRG, DIK_V) && input_->CheckKey(KD_DAT, DIK_LCONTROL))
+        {
+            stage_data_->CopyModel(copy_object_index_);
+        }
+
+        HandleUndoRedo();
+    }
 }
 
 // 左クリック時にTRSギズモまたはステージオブジェクトへのレイ判定を行う
 void Controller::HandleLeftClick()
 {
-    Ray ray = MouseRay::Create();
+    const Ray ray = MouseRay::Create();
 
     // ギズモへのクリックを優先判定。当たった場合はオブジェクト選択判定を行わない
-    Axis a = trs_->RayHitTest(ray);
+    const Axis a = trs_->RayHitTest(ray);
     if (a != Axis::None)
     {
         undo_manager_->Push();      // ドラッグ開始前に現状態を保存
@@ -100,20 +124,20 @@ void Controller::HandleLeftClick()
 
     // ギズモに当たらなかった場合はステージオブジェクトの選択判定
     MeshCollider::CollInfo hit;
-    int index = stage_data_->RayHitTest(ray, &hit);
+    const int index = stage_data_->RayHitTest(ray, &hit);
     if (index >= 0)
     {
-        is_catch = true;
+        is_catch_ = true;
         stage_data_->SetModel(index);
     }
     else
     {
-        is_catch = false;
+        is_catch_ = false;
     }
 }
 
 // Ctrl+Z/Ctrl+YでUndo/Redoを実行する
-void Controller::HandleUndoRedo()
+void Controller::HandleUndoRedo() const
 {
     if (input_->CheckKey(KD_DAT, DIK_LCONTROL))
     {
@@ -152,12 +176,12 @@ void Controller::CameraControl() const
     //回転
     if (input_->IsMouseMove())
     {
-        camera_->Rotate();
+        Camera::Rotate();
     }
     //移動
     if (input_->IsMoveInput())
     {
-        camera_->Move();
+        Camera::Move();
     }
 }
 
@@ -165,7 +189,7 @@ void Controller::Draw()
 {
     Transform* t = stage_data_ ? stage_data_->GetSelectedTransform() : nullptr;
     if (not t) return;
-    if (not is_catch)return;
+    if (not is_catch_)return;
     ImGui::SetNextWindowPos(ImVec2(kTransformWindowX, kTransformWindowY), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(kTransformWindowW, kTransformWindowH), ImGuiCond_Once);
     ImGui::Begin("Transform");

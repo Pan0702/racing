@@ -38,6 +38,12 @@ void TRS::Update()
     translation_->SetPosition(t->position);
     rotation_->SetPosition(t->position);
     scaling_->SetPosition(t->position);
+
+    // カメラ距離に応じてスケールを調整し、常に同じ見かけサイズを維持する
+    VECTOR3 cam_pos = GameDevice()->m_vEyePt;
+    translation_->UpdateScaleByCamera(cam_pos);
+    rotation_->UpdateScaleByCamera(cam_pos);
+    scaling_->UpdateScaleByCamera(cam_pos);
 }
 
 // ドラッグ中の軸に沿って選択オブジェクトのTransformを更新する
@@ -188,6 +194,7 @@ void TRS::Draw()
 // ImGuiでTRSモード切替と各設定UIをまとめて描画する
 void TRS::DrawImGui()
 {
+    ImGui::SetNextWindowPos(ImVec2(350, 10), ImGuiCond_Once);
     ImGui::Begin("MoveAmount", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGui::RadioButton("Translation", &selected_, kTranslation);

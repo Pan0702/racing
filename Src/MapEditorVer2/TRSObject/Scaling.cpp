@@ -3,6 +3,7 @@
 CScaling::CScaling()
 {
     InitMeshes();
+    SetDrawOrder(10);
 }
 
 // X/Y/Z軸のスケールギズモメッシュとコライダーを初期化する

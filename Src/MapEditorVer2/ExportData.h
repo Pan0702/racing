@@ -19,10 +19,10 @@ public:
     /// <param name="model_name">モデルの名前</param>
     /// <param name="transform">変換するTransform</param>
     /// <returns>変換後のJSONオブジェクト</returns>
-    nlohmann::json TransformToJson(const std::string& model_name, const Transform& transform);
+    static nlohmann::json TransformToJson(const std::string& model_name, const Transform& transform);
 
     /// <summary>ステージ上の全オブジェクトをJSON配列にシリアライズしてファイルに書き出す</summary>
-    /// <param name="filename">出力ファイル名（拡張子なし）</param>
+    /// <param name="file_name">出力ファイル名（拡張子なし）</param>
     /// <param name="modelList">エクスポートするオブジェクトのリスト</param>
-    void ExportAllModels(const std::string& filename, const std::vector<StageDataInfo>& modelList);
+    static void ExportAllModels(const std::string& file_name, const std::vector<StageDataInfo>& modelList);
 };

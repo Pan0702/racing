@@ -1,6 +1,5 @@
 #include "FbxParser.h"
 
-#include <array>
 #include <cmath>
 #include <fstream>
 #include <stdexcept>
@@ -258,13 +257,13 @@ bool FbxParser::ExtractGeometry(
     if (uv_ref == "IndexToDirect")
         uv_idx = ReadIntArray(le_uv, "UVIndex");
     
-    std::array<float, 16> mat = GetGlobalMatrix(model);
+    MATRIX4X4 mat = GetGlobalMatrix(model);
 
     // --- デバッグ: 行列の移動成分を確認 ---
     {
         char buf[256];
         sprintf_s(buf, "[FbxParser] GlobalMatrix T=(%.3f, %.3f, %.3f)\n",
-                  mat[12], mat[13], mat[14]);
+                  mat.m[3][0], mat.m[3][1], mat.m[3][2]);
         OutputDebugStringA(buf);
     }
     
@@ -291,13 +290,13 @@ bool FbxParser::ExtractGeometry(
 
         MeshVertex v{};
         // 位置にグローバル変換行列を適用する（行優先）
-        v.position[0] = (mat[0] * px + mat[4] * py + mat[8]  * pz + mat[12]) / 100.0f;
-        v.position[1] = (mat[1] * px + mat[5] * py + mat[9]  * pz + mat[13]) / 100.0f;
-        v.position[2] = (mat[2] * px + mat[6] * py + mat[10] * pz + mat[14]) / 100.0f;
+        v.position[0] = (mat.m[0][0] * px + mat.m[1][0] * py + mat.m[2][0] * pz + mat.m[3][0]) / 100.0f;
+        v.position[1] = (mat.m[0][1] * px + mat.m[1][1] * py + mat.m[2][1] * pz + mat.m[3][1]) / 100.0f;
+        v.position[2] = (mat.m[0][2] * px + mat.m[1][2] * py + mat.m[2][2] * pz + mat.m[3][2]) / 100.0f;
         // 法線に回転のみ適用して再正規化する
-        float wnx = mat[0] * nx + mat[4] * ny + mat[8] * nz;
-        float wny = mat[1] * nx + mat[5] * ny + mat[9] * nz;
-        float wnz = mat[2] * nx + mat[6] * ny + mat[10] * nz;
+        float wnx = mat.m[0][0] * nx + mat.m[1][0] * ny + mat.m[2][0] * nz;
+        float wny = mat.m[0][1] * nx + mat.m[1][1] * ny + mat.m[2][1] * nz;
+        float wnz = mat.m[0][2] * nx + mat.m[1][2] * ny + mat.m[2][2] * nz;
         float len = std::sqrt(wnx * wnx + wny * wny + wnz * wnz);
         if (len > 1e-6f)
         {
@@ -351,30 +350,13 @@ int64_t FbxParser::ReadNodeId(uint64_t offset) const
 }
 
 // ----------------------------------------------------------------
-//  行優先 4x4 行列の乗算: result = a * b
-// ----------------------------------------------------------------
-std::array<float, 16> FbxParser::MatMul(
-    const std::array<float, 16>& a,
-    const std::array<float, 16>& b)
-{
-    std::array<float, 16> r{};
-    for (int row = 0; row < 4; ++row)
-        for (int col = 0; col < 4; ++col)
-            for (int k = 0; k < 4; ++k)
-                r[row * 4 + col] += a[row * 4 + k] * b[k * 4 + col];
-    return r;
-}
-
-// ----------------------------------------------------------------
 //  Model ノードからグローバル変換行列を取得する
 //  Connections の親チェーンを再帰的に辿り、全祖先のローカル行列を結合する
 //  （FbxNode::EvaluateGlobalTransform() 相当）
 // ----------------------------------------------------------------
-std::array<float, 16> FbxParser::GetGlobalMatrix(Node* model) const
+MATRIX4X4 FbxParser::GetGlobalMatrix(Node* model) const
 {
-    const std::array<float, 16> identity = {
-        1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
-    };
+    const MATRIX4X4 identity(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
     if (!model) return identity;
 
     int64_t model_id = ReadNodeId(model->prop_start);
@@ -386,9 +368,9 @@ std::array<float, 16> FbxParser::GetGlobalMatrix(Node* model) const
         if (node_it != model_map_.end())
         {
             // 親のグローバル行列 × 自分のローカル行列
-            std::array<float, 16> parent_global = GetGlobalMatrix(node_it->second);
-            std::array<float, 16> local = GetLocalMatrix(model);
-            return MatMul(parent_global, local);
+            MATRIX4X4 parent_global = GetGlobalMatrix(node_it->second);
+            MATRIX4X4 local = GetLocalMatrix(model);
+            return parent_global * local;
         }
     }
 
@@ -400,16 +382,10 @@ std::array<float, 16> FbxParser::GetGlobalMatrix(Node* model) const
 //  Model ノードからローカル変換行列 (TRS) を取得する
 //  行優先 4x4, Euler 回転順序は FBX 標準の XYZ
 // ----------------------------------------------------------------
-std::array<float, 16> FbxParser::GetLocalMatrix(Node* model) const
+MATRIX4X4 FbxParser::GetLocalMatrix(Node* model) const
 {
-    std::array<float, 16> m = {
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-    };
+    MATRIX4X4 m(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
     if (!model) return m;
-
     Node* props70 = FindNode(model->children, "Properties70");
     if (!props70) return m;
 
@@ -495,22 +471,22 @@ std::array<float, 16> FbxParser::GetLocalMatrix(Node* model) const
     double crz = cos(rz), srz = sin(rz);
 
     // 行優先 TRS 行列（R = Rz * Ry * Rx）
-    m[0] = float(sx * (cry * crz));
-    m[1] = float(sx * (cry * srz));
-    m[2] = float(sx * (-sry));
-    m[3] = 0.0f;
-    m[4] = float(sy * (srx * sry * crz - crx * srz));
-    m[5] = float(sy * (srx * sry * srz + crx * crz));
-    m[6] = float(sy * (srx * cry));
-    m[7] = 0.0f;
-    m[8] = float(sz * (crx * sry * crz + srx * srz));
-    m[9] = float(sz * (crx * sry * srz - srx * crz));
-    m[10] = float(sz * (crx * cry));
-    m[11] = 0.0f;
-    m[12] = float(tx);
-    m[13] = float(ty);
-    m[14] = float(tz);
-    m[15] = 1.0f;
+    m.m[0][0] = static_cast<float>(sx * (cry * crz));
+    m.m[0][1] = static_cast<float>(sx * (cry * srz));
+    m.m[0][2] = static_cast<float>(sx * (-sry));
+    m.m[0][3] = 0.0f;
+    m.m[1][0] = static_cast<float>(sy * (srx * sry * crz - crx * srz));
+    m.m[1][1] = static_cast<float>(sy * (srx * sry * srz + crx * crz));
+    m.m[1][2] = static_cast<float>(sy * (srx * cry));
+    m.m[1][3] = 0.0f;
+    m.m[2][0] = static_cast<float>(sz * (crx * sry * crz + srx * srz));
+    m.m[2][1] = static_cast<float>(sz * (crx * sry * srz - srx * crz));
+    m.m[2][2] = static_cast<float>(sz * (crx * cry));
+    m.m[2][3] = 0.0f;
+    m.m[3][0] = static_cast<float>(tx);
+    m.m[3][1] = static_cast<float>(ty);
+    m.m[3][2] = static_cast<float>(tz);
+    m.m[3][3] = 1.0f;
     return m;
 }
 

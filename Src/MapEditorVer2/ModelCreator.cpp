@@ -1,6 +1,6 @@
 #include "ModelCreator.h"
-#include <filesystem>
 #include <string>
+#include <vector>
 
 #include "Buttom.h"
 #include "../ModelStorage.h"
@@ -69,6 +69,41 @@ void ModelCreator::ConvertAndLoad(const std::string& fbx_path)
     {
         MessageBox(0, _T("No Texture"), nullptr, MB_OK);
         return;
+    }
+    // FBX ファイルのディレクトリ基準でテクスチャパスを解決し '..' を除去する
+    {
+        size_t sep = fbx_path.find_last_of("/\\");
+        std::string combined = (sep != std::string::npos)
+            ? fbx_path.substr(0, sep + 1) + tex_name
+            : tex_name;
+
+        std::vector<std::string> segs;
+        std::string seg;
+        for (char c : combined)
+        {
+            if (c == '/' || c == '\\')
+            {
+                if (!seg.empty())
+                {
+                    if (seg == ".." && !segs.empty()) segs.pop_back();
+                    else if (seg != ".")              segs.push_back(seg);
+                    seg.clear();
+                }
+            }
+            else seg += c;
+        }
+        if (!seg.empty())
+        {
+            if (seg == ".." && !segs.empty()) segs.pop_back();
+            else if (seg != ".")              segs.push_back(seg);
+        }
+
+        tex_name.clear();
+        for (size_t i = 0; i < segs.size(); ++i)
+        {
+            if (i > 0) tex_name += '/';
+            tex_name += segs[i];
+        }
     }
     MeshWriter writer;
     if (!writer.Write(mesh_path, tex_name, verts, indices)) return;

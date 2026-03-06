@@ -5,17 +5,22 @@
 
 struct StageDataInfo
 {
-    Transform transform;
-    std::string model_name;
+    Transform transform_;
+    std::string model_name_;
     StageDataInfo()
     {
-        transform.position = VECTOR3(0, 0, 0);
-        model_name = "";
+        transform_.position = VECTOR3(0, 0, 0);
+        model_name_ = "";
     }
-    StageDataInfo(const std::string& model_name_,const VECTOR3& pos_)
+    StageDataInfo(const std::string& model_name,const VECTOR3& pos)
     {
-        model_name = std::move(model_name_);
-        transform.position = pos_;
+        model_name_ = std::move(model_name);
+        transform_.position = pos;
+    }
+    StageDataInfo(const std::string& model_name,const Transform& t)
+    {
+        model_name_ = std::move(model_name);
+        transform_ = t;
     }
 };
 
@@ -37,6 +42,8 @@ public:
     /// <param name="model_name">使用するモデルの名前</param>
     void AddModel(const VECTOR3& pos, const std::string& model_name);
     
+    void AddModel(const Transform& t ,const std::string&model_name);
+    
     /// <summary>Transform  全体を指定してオブジェクト をステージに追加する（インポート用）</summary>               
     /// <param name="model_name">使用する モデルの名前</param>        
     /// <param name="transform">配置するTransform（位置・回転・スケール）</param>  
@@ -54,6 +61,10 @@ public:
 
     /// <summary>現在選択中のオブジェクトをステージから削除する</summary>
     void DeleteModel();
+    
+    /// <summary>指定インデックスにあるオブジェクトをステージから削除する</summary>
+    /// /// <param name="index">指定インデックス</param>
+    void DeleteModel(int index);
 
     /// <summary>現在選択中のオブジェクトのTransformポインタを返す。未選択時はnullptr</summary>
     Transform* GetSelectedTransform();
@@ -67,10 +78,15 @@ public:
     /// <param name="index">選択するインデックス</param>
     void SetModel(int index);
 
+    /// <summary>指定インデックスのオブジェクトをステージにコピーする</summary>
+    /// <param name="index"> コピーするオブジェクトの配列番号　</param>
+    void CopyModel(int index);
+    
     /// <summary>現在選択中のオブジェクトインデックスを返す</summary>
-    int GetIndex() const;
+    int GetSelectIndex() const;
 
     /// <summary>ステージに設置されてるすべてのオブジェクトを返す</summary>
     const std::vector<StageDataInfo>& GetStageDataInfo() const;
 };
+
 

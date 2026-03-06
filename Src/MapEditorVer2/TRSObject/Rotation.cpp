@@ -4,6 +4,8 @@
 CRotation::CRotation()
 {
     InitMeshes();
+    SetDrawOrder(10);
+    transform.scale = VECTOR3{2.0f, 2.0f, 2.0f};
 }
 
 // X/Y/Z軸の回転ギズモメッシュとコライダーを初期化する
