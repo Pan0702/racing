@@ -179,6 +179,8 @@ void Button::ReleaseModelPreviews()
     model_previews_.clear();
 }
 
+
+
 // ImageButtonDataの内容に応じてImGuiのボタンを1つ描画する
 void Button::CreateImageButton(const ImageButtonData& buttonData)
 {
@@ -270,6 +272,37 @@ void Button::DebugImGui()
             Import importer;
             importer.ImportFromFile(path);
         }
+    }
+    ImGui::End();
+    DrawHierarchy();
+}
+
+void Button::DrawHierarchy()
+{
+    ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    StageData* data = ObjectManager::FindGameObject<StageData>();
+    const std::vector<StageDataInfo>& stage_data= data->GetStageDataInfo();
+    
+    std::unordered_map<std::string, int> nameCounts;
+    for (int i = 0; i < stage_data.size(); i++)
+    {
+        bool is_select = (select_id == i);
+        std::string name = stage_data[i].model_name;
+        
+        // すでに同じ名前が登録されているか確認
+        if (nameCounts.find(name) != nameCounts.end()) {
+            // 2回目以降の出現なので、カウントを増やして名前に反映
+            nameCounts[name]++;
+            name += "_" + std::to_string(nameCounts[name]);
+        } else {
+            // 初めて出てくる名前なら、カウントを1に設定
+            nameCounts[name] = 0;
+        }
+            if (ImGui::Selectable(name.c_str(),is_select))
+            {
+                data->SetModel(i);
+                select_id = i;
+            }
     }
     ImGui::End();
 }

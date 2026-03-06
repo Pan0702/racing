@@ -98,6 +98,11 @@ int StageData::GetIndex() const
     return selected_model_;
 }
 
+const std::vector<StageDataInfo>& StageData::GetStageDataInfo() const
+{
+    return stage_data_;
+}
+
 // 現在選択中のオブジェクトのTransformポインタを返す。未選択時はnullptr
 Transform* StageData::GetSelectedTransform()
 {

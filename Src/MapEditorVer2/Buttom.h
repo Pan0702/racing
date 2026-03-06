@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_map>
+
 #include "GridDraw.h"
 #include "ModelCreator.h"
 #include "../Object3D.h"
@@ -46,6 +48,9 @@ private:
     std::vector<ModelPreviewRT>  model_previews_;
     ModelCreator* model_creator_;
     GridDraw* grid_draw_;
+    int select_id;
+    
+
 public:
     Button();
     ~Button();
@@ -70,7 +75,7 @@ private:
 
     /// <summary>ボタンがクリックされたとき、対応モデルをステージに追加する</summary>
     /// <param name="buttonID">クリックされたボタンのID</param>
-    void HandleButtonClick(const std::string& buttonID);
+    static void HandleButtonClick(const std::string& buttonID);
 
     /// <summary>エディタUIのImGuiウィンドウ（モデル追加・エクスポート・グリッド設定）を描画する</summary>
     void DebugImGui();
@@ -87,5 +92,6 @@ private:
     /// <summary>全モデルプレビューのD3Dリソースを解放してリストをクリアする</summary>
     void ReleaseModelPreviews();
 
+    void DrawHierarchy();
 
 };

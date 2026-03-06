@@ -69,5 +69,8 @@ public:
 
     /// <summary>現在選択中のオブジェクトインデックスを返す</summary>
     int GetIndex() const;
+
+    /// <summary>ステージに設置されてるすべてのオブジェクトを返す</summary>
+    const std::vector<StageDataInfo>& GetStageDataInfo() const;
 };
 

@@ -2,6 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // .mesh ファイルの頂点構造体（stride = 32 bytes）
@@ -31,6 +32,9 @@ private:
     uint32_t             version_ = 0;
     bool                 is64bit_ = false;
     std::vector<Node>    roots_;
+    // Connections から構築するルックアップテーブル
+    std::unordered_map<int64_t, Node*>   model_map_;          // Model ID → Node*
+    std::unordered_map<int64_t, int64_t> model_parent_map_;   // Model ID → 親 Model ID
 
 public:
     /// <summary>
@@ -77,6 +81,17 @@ private:
     /// FBX 7400 以前は 'I'(int32)、7500 以降は 'L'(int64)。
     /// </summary>
     int64_t ReadNodeId(uint64_t offset) const;
+
+    static std::array<float, 16> MatMul(
+        const std::array<float, 16>& a,
+        const std::array<float, 16>& b);
+    
+    /// <summary>
+    /// Model ノードからグローバル変換行列 (親チェーンを再帰的に結合) を取得する。
+    /// 行優先 4x4、Euler 回転順序は FBX 標準の XYZ。
+    /// model が nullptr の場合は単位行列を返す。
+    /// </summary>
+    std::array<float, 16> GetGlobalMatrix(Node* model) const;
 
     /// <summary>
     /// Model ノードからローカル変換行列 (TRS) を取得する。

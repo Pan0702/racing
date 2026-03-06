@@ -7,13 +7,10 @@ Curve::Curve()
     if (m != nullptr)
     {
         mesh =  m->GetModel("Curve");
-       // meshCol = m->GetCollider("Curve");
+        meshCol = m->GetCollider("Curve");
     }
 }
 
-Curve::~Curve()
-{
-}
 
 void Curve::Draw()
 {

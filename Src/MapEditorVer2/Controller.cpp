@@ -53,10 +53,13 @@ void Controller::Update()
         camera_->Zoom();
     }
     
+    //オブジェクトをズーム
     if (input_->CheckKey(KD_TRG, DIK_F))
     {
         camera_->Focus();
     }
+    
+    
     if (is_catch)
     {
         // BackSpace / Delete でオブジェクト削除
@@ -72,8 +75,8 @@ void Controller::Update()
         }
     }
 
-    // クリックした瞬間
-    if (input_->CheckMouse(KD_TRG, DIM_LBUTTON))
+    // クリックした瞬間（ImGui がマウスを使っている場合はスキップ）
+    if (input_->CheckMouse(KD_TRG, DIM_LBUTTON) && !ImGui::GetIO().WantCaptureMouse)
     {
         HandleLeftClick();
     }

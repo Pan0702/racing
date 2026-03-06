@@ -9,6 +9,8 @@
 #include <windows.h>
 #include <zlib.h>
 
+#include "../../MyMath.h"
+
 namespace
 {
     constexpr char kFbxMagic[] = "Kaydara FBX Binary  \x00\x1a\x00";
@@ -74,19 +76,26 @@ bool FbxParser::ExtractMesh(
     }
 
     // --- Model ID → Node のマップを作成 ---
-    std::unordered_map<int64_t, Node*> model_map;
+    model_map_.clear();
     for (auto& child : objects->children)
+    {
         if (child.name == "Model")
-            model_map[ReadNodeId(child.prop_start)] = &child;
-
+            model_map_[ReadNodeId(child.prop_start)] = &child;
+    }
+    
     // --- Geometry ID セットを作成 ---
     std::unordered_map<int64_t, Node*> geo_map;
     for (auto& child : objects->children)
+    {
         if (child.name == "Geometry")
             geo_map[ReadNodeId(child.prop_start)] = &child;
+    }
 
-    // --- Connections から Geometry ID → Model ID のマップを作成 ---
+    // --- Connections から接続情報を収集 ---
+    //   geo_to_model      : Geometry ID → 直接の親 Model ID
+    //   model_parent_map_ : Model ID    → 親 Model ID（グローバル行列の再帰計算用）
     std::unordered_map<int64_t, int64_t> geo_to_model;
+    model_parent_map_.clear();
     Node* conn_node = FindNode(roots_, "Connections");
     if (conn_node)
     {
@@ -100,14 +109,33 @@ bool FbxParser::ExtractMesh(
                 uint32_t l = Read<uint32_t>(off + 1);
                 off += 5 + l;
             }
-            int64_t id1 = ReadNodeId(off);
-            off += is64bit_ ? 9u : 5u;
-            int64_t id2 = ReadNodeId(off);
+            // タグを実際に読んでオフセットを正確に進める
+            uint8_t tag1 = data_[off];
+            int64_t id1  = ReadNodeId(off);
+            off += (tag1 == 'L') ? 9u : 5u;
+            int64_t id2  = ReadNodeId(off);
+
             if (geo_map.count(id1))
                 geo_to_model[id1] = id2;
+            else if (model_map_.count(id1) && model_map_.count(id2))
+                model_parent_map_[id1] = id2;
         }
     }
-
+    // // --- デバッグ: model_map_ / model_parent_map_ の内容を確認 ---
+    // {
+    //     char buf[256];
+    //     sprintf_s(buf, "[FbxParser] model_map_ size=%zu  model_parent_map_ size=%zu\n",
+    //               model_map_.size(), model_parent_map_.size());
+    //     OutputDebugStringA(buf);
+    // }
+    //
+    // // --- デバッグ: geo_to_model の内容を確認 ---
+    // {
+    //     char buf[256];
+    //     sprintf_s(buf, "[FbxParser] geo_map size=%zu  geo_to_model size=%zu\n",
+    //               geo_map.size(), geo_to_model.size());
+    //     OutputDebugStringA(buf);
+    // }
     // --- 全 Geometry を展開して結合 ---
     out_verts.clear();
     out_indices.clear();
@@ -128,8 +156,16 @@ bool FbxParser::ExtractMesh(
         auto it = geo_to_model.find(geo_id);
         if (it != geo_to_model.end())
         {
-            auto mit = model_map.find(it->second);
-            if (mit != model_map.end()) model = mit->second;
+            // // --- デバッグ: ID の照合を確認 ---
+            // char buf[256];
+            // sprintf_s(buf, "[FbxParser] geo_id=%lld  model_id_from_conn=%lld  in_model_map=%s\n",
+            //           geo_id, it->second,
+            //           model_map_.count(it->second) ? "YES" : "NO");
+            // OutputDebugStringA(buf);
+
+            
+            auto mit = model_map_.find(it->second);
+            if (mit != model_map_.end()) model = mit->second;
         }
 
         if (!ExtractGeometry(&child, model, out_verts, out_indices))
@@ -221,26 +257,22 @@ bool FbxParser::ExtractGeometry(
     std::vector<int32_t> uv_idx = {};
     if (uv_ref == "IndexToDirect")
         uv_idx = ReadIntArray(le_uv, "UVIndex");
+    
+    std::array<float, 16> mat = GetGlobalMatrix(model);
 
-    // ローカル Transform 行列を取得する
-    std::array<float, 16> mat = GetLocalMatrix(model);
-
-    // 頂点の一意性は (pos_idx, uv_idx) のみで判定する
-    using VertKey = std::pair<uint32_t, uint32_t>;
-    struct KeyHash
+    // --- デバッグ: 行列の移動成分を確認 ---
     {
-        size_t operator()(const VertKey& k) const
-        {
-            return std::hash<uint64_t>()(
-                (static_cast<uint64_t>(k.first) << 32) | k.second);
-        }
-    };
-    std::unordered_map<VertKey, uint32_t, KeyHash> vertex_map;
+        char buf[256];
+        sprintf_s(buf, "[FbxParser] GlobalMatrix T=(%.3f, %.3f, %.3f)\n",
+                  mat[12], mat[13], mat[14]);
+        OutputDebugStringA(buf);
+    }
+    
     const uint32_t vertex_offset = static_cast<uint32_t>(out_verts.size());
-
     uint32_t pv_counter = 0;
     std::vector<std::pair<uint32_t, uint32_t>> face;
 
+    // ポリゴン頂点ごとに必ず新規頂点を生成し、インデックスを 0 から振り直す
     auto emit_vertex = [&](uint32_t pos_idx, uint32_t pv_idx)
     {
         uint32_t n_idx = (norm_ref == "IndexToDirect")
@@ -250,49 +282,39 @@ bool FbxParser::ExtractGeometry(
                              ? static_cast<uint32_t>(uv_idx[pv_idx])
                              : pv_idx;
 
-        VertKey key{pos_idx, u_idx};
-        auto it = vertex_map.find(key);
-        if (it == vertex_map.end())
-        {
-            uint32_t new_idx = static_cast<uint32_t>(vertex_map.size());
-            vertex_map[key] = new_idx;
+        float px = static_cast<float>(raw_pos[pos_idx * 3 + 0]);
+        float py = static_cast<float>(raw_pos[pos_idx * 3 + 1]);
+        float pz = static_cast<float>(raw_pos[pos_idx * 3 + 2]);
+        float nx = static_cast<float>(raw_norm[n_idx * 3 + 0]);
+        float ny = static_cast<float>(raw_norm[n_idx * 3 + 1]);
+        float nz = static_cast<float>(raw_norm[n_idx * 3 + 2]);
 
-            float px = static_cast<float>(raw_pos[pos_idx * 3 + 0]);
-            float py = static_cast<float>(raw_pos[pos_idx * 3 + 1]);
-            float pz = static_cast<float>(raw_pos[pos_idx * 3 + 2]);
-            float nx = static_cast<float>(raw_norm[n_idx * 3 + 0]);
-            float ny = static_cast<float>(raw_norm[n_idx * 3 + 1]);
-            float nz = static_cast<float>(raw_norm[n_idx * 3 + 2]);
-
-            MeshVertex v{};
-            // 位置に変換行列を適用する（行優先）
-            v.position[0] = mat[0] * px + mat[4] * py + mat[8] * pz + mat[12];
-            v.position[1] = mat[1] * px + mat[5] * py + mat[9] * pz + mat[13];
-            v.position[2] = mat[2] * px + mat[6] * py + mat[10] * pz + mat[14];
-            // 法線に回転のみ適用して再正規化する
-            float wnx = mat[0] * nx + mat[4] * ny + mat[8] * nz;
-            float wny = mat[1] * nx + mat[5] * ny + mat[9] * nz;
-            float wnz = mat[2] * nx + mat[6] * ny + mat[10] * nz;
-            float len = std::sqrt(wnx * wnx + wny * wny + wnz * wnz);
-            if (len > 1e-6f)
-            {
-                wnx /= len;
-                wny /= len;
-                wnz /= len;
-            }
-            v.normal[0] = wnx;
-            v.normal[1] = wny;
-            v.normal[2] = wnz;
-            // UV はそのまま（V 軸反転はシェーダー側で行う）
-            v.uv[0] = static_cast<float>(raw_uv[u_idx * 2 + 0]);
-            v.uv[1] = 1.0f - static_cast<float>(raw_uv[u_idx * 2 + 1]);
-            out_verts.push_back(v);
-            out_indices.push_back(vertex_offset + new_idx);
-        }
-        else
+        MeshVertex v{};
+        // 位置にグローバル変換行列を適用する（行優先）
+        v.position[0] = (mat[0] * px + mat[4] * py + mat[8]  * pz + mat[12]) / 100.0f;
+        v.position[1] = (mat[1] * px + mat[5] * py + mat[9]  * pz + mat[13]) / 100.0f;
+        v.position[2] = (mat[2] * px + mat[6] * py + mat[10] * pz + mat[14]) / 100.0f;
+        // 法線に回転のみ適用して再正規化する
+        float wnx = mat[0] * nx + mat[4] * ny + mat[8] * nz;
+        float wny = mat[1] * nx + mat[5] * ny + mat[9] * nz;
+        float wnz = mat[2] * nx + mat[6] * ny + mat[10] * nz;
+        float len = std::sqrt(wnx * wnx + wny * wny + wnz * wnz);
+        if (len > 1e-6f)
         {
-            out_indices.push_back(vertex_offset + it->second);
+            wnx /= len;
+            wny /= len;
+            wnz /= len;
         }
+        v.normal[0] = wnx;
+        v.normal[1] = wny;
+        v.normal[2] = wnz;
+        // UV はそのまま（V 軸反転はシェーダー側で行う）
+        v.uv[0] = static_cast<float>(raw_uv[u_idx * 2 + 0]);
+        v.uv[1] = 1.0f - static_cast<float>(raw_uv[u_idx * 2 + 1]);
+
+        uint32_t new_idx = static_cast<uint32_t>(out_verts.size() - vertex_offset);
+        out_verts.push_back(v);
+        out_indices.push_back(vertex_offset + new_idx);
     };
 
     for (int32_t raw : poly_idx)
@@ -326,6 +348,52 @@ int64_t FbxParser::ReadNodeId(uint64_t offset) const
     if (tc == 'L') return Read<int64_t>(offset + 1);
     if (tc == 'I') return static_cast<int64_t>(Read<int32_t>(offset + 1));
     return 0;
+}
+
+// ----------------------------------------------------------------
+//  行優先 4x4 行列の乗算: result = a * b
+// ----------------------------------------------------------------
+std::array<float, 16> FbxParser::MatMul(
+    const std::array<float, 16>& a,
+    const std::array<float, 16>& b)
+{
+    std::array<float, 16> r{};
+    for (int row = 0; row < 4; ++row)
+        for (int col = 0; col < 4; ++col)
+            for (int k = 0; k < 4; ++k)
+                r[row * 4 + col] += a[row * 4 + k] * b[k * 4 + col];
+    return r;
+}
+
+// ----------------------------------------------------------------
+//  Model ノードからグローバル変換行列を取得する
+//  Connections の親チェーンを再帰的に辿り、全祖先のローカル行列を結合する
+//  （FbxNode::EvaluateGlobalTransform() 相当）
+// ----------------------------------------------------------------
+std::array<float, 16> FbxParser::GetGlobalMatrix(Node* model) const
+{
+    const std::array<float, 16> identity = {
+        1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+    };
+    if (!model) return identity;
+
+    int64_t model_id = ReadNodeId(model->prop_start);
+
+    auto parent_it = model_parent_map_.find(model_id);
+    if (parent_it != model_parent_map_.end())
+    {
+        auto node_it = model_map_.find(parent_it->second);
+        if (node_it != model_map_.end())
+        {
+            // 親のグローバル行列 × 自分のローカル行列
+            std::array<float, 16> parent_global = GetGlobalMatrix(node_it->second);
+            std::array<float, 16> local = GetLocalMatrix(model);
+            return MatMul(parent_global, local);
+        }
+    }
+
+    // 親がいない（ルートノード）ならローカル行列がそのままグローバル行列
+    return GetLocalMatrix(model);
 }
 
 // ----------------------------------------------------------------
@@ -409,9 +477,9 @@ std::array<float, 16> FbxParser::GetLocalMatrix(Node* model) const
         }
         else if (pname == "Lcl Rotation")
         {
-            rx = vx;
-            ry = vy;
-            rz = vz;
+            rx = vx * DegToRad;
+            ry = vy * DegToRad;
+            rz = vz * DegToRad;
         }
         else if (pname == "Lcl Scaling")
         {
@@ -421,10 +489,10 @@ std::array<float, 16> FbxParser::GetLocalMatrix(Node* model) const
         }
     }
 
-    constexpr double kPi = 3.14159265358979323846;
-    double crx = cos(rx * kPi / 180), srx = sin(rx * kPi / 180);
-    double cry = cos(ry * kPi / 180), sry = sin(ry * kPi / 180);
-    double crz = cos(rz * kPi / 180), srz = sin(rz * kPi / 180);
+    // rx/ry/rz はすでに DegToRad 済みなのでそのまま渡す
+    double crx = cos(rx), srx = sin(rx);
+    double cry = cos(ry), sry = sin(ry);
+    double crz = cos(rz), srz = sin(rz);
 
     // 行優先 TRS 行列（R = Rz * Ry * Rx）
     m[0] = float(sx * (cry * crz));
