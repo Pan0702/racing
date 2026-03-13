@@ -6,6 +6,7 @@
 /// <author>N.Hanai</author>
 #include <string>
 #include <list>
+#include <memory>
 
 class SceneFactory;
 class SceneBase;
@@ -30,7 +31,7 @@ namespace SceneManager {
 	/// 現在のシーンとして登録する
 	/// </summary>
 	/// <param name="scene"></param>
-	void SetCurrentScene(SceneBase* scene);
+	void SetCurrentScene(std::unique_ptr<SceneBase> scene);
 
 	/// <summary>
 	/// シーンを切り替える。

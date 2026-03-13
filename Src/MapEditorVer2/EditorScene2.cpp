@@ -3,6 +3,7 @@
 #include "BackGraund.h"
 #include "Buttom.h"
 #include "Controller.h"
+#include "RandomPlacer.h"
 #include "TRSObject/TRS.h"
 #include "StageData.h"
 

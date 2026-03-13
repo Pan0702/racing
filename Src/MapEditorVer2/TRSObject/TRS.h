@@ -14,6 +14,7 @@ private:
     std::unique_ptr<CRotation> rotation_;
     std::unique_ptr<CScaling> scaling_;
     StageData* stage_data_ = nullptr;
+    Transform* override_target_ = nullptr;
     Axis dragging_axis_ = Axis::None;
 
     int state_ = 0;
@@ -45,6 +46,8 @@ private:
     /// <param name="compo">更新対象の回転成分（参照）</param>
     /// <param name="delta">今フレームの回転量</param>
     void SnapRotation(float& compo, float delta);
+    
+    Transform* GetTarget();
 
 public:
     TRS();
@@ -59,7 +62,7 @@ public:
     /// <summary>現在のモードに応じたギズモとレイの当たり判定を行い、当たった軸を返す</summary>
     /// <param name="ray">判定に使用するレイ</param>
     /// <returns>当たった軸（X/Y/Z）、当たらなければNone</returns>
-    Axis RayHitTest(const Ray& ray);
+    Axis RayHitTest(const Ray& ray) const;
 
     /// <summary>ドラッグ中の軸に沿って選択オブジェクトのTransformを更新する</summary>
     void SetTransform();
@@ -74,6 +77,8 @@ public:
     /// <param name="axis">設定する軸</param>
     void SetDraggingAxis(Axis axis) { dragging_axis_ = axis; }
 
+    void SetOverrideTarget(Transform* t);
+    
     enum State : uint8_t
     {
         kNone,

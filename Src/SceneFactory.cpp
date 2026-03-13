@@ -8,31 +8,31 @@
 #include "PlayScene.h"
 #include "MapEditorVer2/EditorScene2.h"
 
-SceneBase* SceneFactory::CreateFirst()
+std::unique_ptr<SceneBase> SceneFactory::CreateFirst()
 {
 
 	//SingleInstantiate<EditorDataCarrier>();
 	SingleInstantiate<CModelStorage>();
-	return new TitleScene();
+	return std::make_unique<TitleScene>();
 	return nullptr;
 }
 
-SceneBase * SceneFactory::Create(const std::string & name)
+std::unique_ptr<SceneBase> SceneFactory::Create(const std::string& name)
 {
 	if (name == "TitleScene") {
-		return new TitleScene();
+		return std::make_unique<TitleScene>();
 	}
 	if (name == "PlayScene")
 	{
-		return new PlayScene();
+		return std::make_unique<PlayScene>();
 	}
 	if (name == "MapEditor")
 	{
-		return new CEditorScene();
+		return std::make_unique<CEditorScene>();
 	}
 	if (name == "EditorScene2")
 	{
-		return new EditorScene2();
+		return std::make_unique<EditorScene2>();
 	}
 	assert(false);
 	return nullptr;

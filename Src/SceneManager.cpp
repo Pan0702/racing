@@ -7,14 +7,14 @@
 namespace {
 	std::string currentName; // 現在のシーンの名称
 	std::string nextName;    // 次のシーンの名称
-	SceneBase* currentScene; // 今のシーンのインスタンスを保持
-	SceneFactory* factory;   // シーン切り替え用のFactoryのポインター
+	std::unique_ptr<SceneBase> currentScene; // 今のシーンのインスタンスを保持
+	std::unique_ptr<SceneFactory> factory;   // シーン切り替え用のFactoryのポインター
 
 	// DeltaTime用
 	LARGE_INTEGER freq;
 	LARGE_INTEGER current;
 	float deltaTime;
-	static const int REC_SIZE = 60;
+	static constexpr int REC_SIZE = 60;
 	float record[REC_SIZE]; // 60回分のリングバッファ
 	int recCount = 0;
 
@@ -54,20 +54,20 @@ void SceneManager::Start()
 	nextName = "";
 	currentName = "";
 
-	factory = new SceneFactory();
+	factory = std::make_unique<SceneFactory>();
 	// 最初に動くシーンを、SceneFactoryに作ってもらう
-	currentScene = factory->CreateFirst();
+	currentScene = std::move(factory->CreateFirst());
 }
 
 void SceneManager::Update()
 {
 	if (nextName != currentName) { // シーン切り替えの指定があったので
 		if (currentScene != nullptr) { // 今までのシーンを解放
-			delete currentScene;
+			currentScene.reset();
 			currentScene = nullptr;
 		}
 		currentName = nextName;
-		currentScene = factory->Create(nextName); // 次のシーンを作成
+		currentScene = std::move(factory->Create(nextName)); // 次のシーンを作成
 	}
 	if (currentScene != nullptr)
 		currentScene->Update();
@@ -84,20 +84,20 @@ void SceneManager::Draw()
 void SceneManager::Release()
 {
 	if (currentScene != nullptr) {
-		delete currentScene;
+		currentScene.reset();
 		currentScene = nullptr;
 	}
-	delete factory;
+	factory.reset();
 }
 
 SceneBase* SceneManager::CurrentScene()
 {
-	return currentScene;
+	return currentScene.get();
 }
 
-void SceneManager::SetCurrentScene(SceneBase* scene)
+void SceneManager::SetCurrentScene(std::unique_ptr<SceneBase> scene)
 {
-	currentScene = scene;
+	currentScene = std::move(scene);
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName)

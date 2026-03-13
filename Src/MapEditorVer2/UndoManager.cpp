@@ -19,6 +19,17 @@ void UndoManager::Push()
     redo_stack_ = std::stack<UndoState>();
 }
 
+void UndoManager::Push(Transform* target)
+{
+    if (target == nullptr) return;
+    UndoState state;
+    state.index  = -2;         // StageData管理外のフラグ
+    state.trans  = *target;
+    state.target = target;
+    undo_stack_.push(state);
+    redo_stack_ = std::stack<UndoState>();
+}
+
 // 現在選択中のオブジェクトのTransformをUndoスタックに積む
 void UndoManager::DeleteObjectPush()
 {

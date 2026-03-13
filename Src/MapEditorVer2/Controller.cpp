@@ -24,6 +24,7 @@ Controller::Controller()
     stage_data_ = ObjectManager::FindGameObject<StageData>();
     input_ = GameDevice()->m_pDI;
     undo_manager_ = new UndoManager();
+    random_placer_ = new RandomPlacer();//std::make_unique<RandomPlacer>();
 }
 
 void Controller::SetCatchFlag(bool f)
@@ -73,6 +74,7 @@ void Controller::Update()
         {
             trs_->SetDraggingAxis(Axis::None);
         }
+       // Random();
     }
 
     if (!io.WantCaptureKeyboard)
@@ -106,6 +108,7 @@ void Controller::Update()
 
         HandleUndoRedo();
     }
+
 }
 
 // 左クリック時にTRSギズモまたはステージオブジェクトへのレイ判定を行う
@@ -117,7 +120,15 @@ void Controller::HandleLeftClick()
     const Axis a = trs_->RayHitTest(ray);
     if (a != Axis::None)
     {
-        undo_manager_->Push();      // ドラッグ開始前に現状態を保存
+        if (is_random_placer_)
+        {
+            undo_manager_->Push(random_placer_->GetTransform());
+        }else
+        {
+            // ドラッグ開始前に現状態を保存
+            undo_manager_->Push();  
+        }
+  
         trs_->SetDraggingAxis(a);
         return;
     }
@@ -134,6 +145,7 @@ void Controller::HandleLeftClick()
     {
         is_catch_ = false;
     }
+    Random();
 }
 
 // Ctrl+Z/Ctrl+YでUndo/Redoを実行する
@@ -143,6 +155,24 @@ void Controller::HandleUndoRedo() const
     {
         if (input_->CheckKey(KD_TRG, DIK_Z)) undo_manager_->Undo();
         if (input_->CheckKey(KD_TRG, DIK_Y)) undo_manager_->Redo();
+    }
+}
+
+void Controller::Random()
+{
+    if (random_placer_ == nullptr) return;  
+    if (is_random_placer_)
+    {
+        random_placer_->SetDrawFlag(true);
+        trs_->SetOverrideTarget(random_placer_->GetTransform());
+        trs_->SetState(TRS::State::kTranslation);
+        is_catch_ = true;  // ギズモ表示ON
+    }else
+    {
+        random_placer_->SetDrawFlag(false);
+        trs_->SetOverrideTarget(nullptr);
+        trs_->SetState(TRS::State::kNone);
+        is_catch_ = false;
     }
 }
 
@@ -187,6 +217,17 @@ void Controller::CameraControl() const
 
 void Controller::Draw()
 {
+    ImGui::Begin("Setting");
+    if (ImGui::Checkbox("Random Placer", &is_random_placer_))
+    {
+        Random();
+    }
+
+    ImGui::End();
+    if (is_random_placer_)
+    {
+        random_placer_->Draw(); 
+    }
     Transform* t = stage_data_ ? stage_data_->GetSelectedTransform() : nullptr;
     if (not t) return;
     if (not is_catch_)return;
@@ -226,6 +267,6 @@ void Controller::Draw()
         undo_manager_->Push();
     }
     ImGui::Separator();
-
     ImGui::End();
+
 }

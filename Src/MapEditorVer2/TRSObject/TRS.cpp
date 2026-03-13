@@ -13,11 +13,10 @@ TRS::TRS()
     rotation_ = std::make_unique<CRotation>();
     scaling_ = std::make_unique<CScaling>();
     stage_data_ = ObjectManager::FindGameObject<StageData>();
-    new TRSBase();
 }
 
 // 現在のモードに応じたギズモとレイの当たり判定を行い、当たった軸を返す
-Axis TRS::RayHitTest(const Ray& ray)
+Axis TRS::RayHitTest(const Ray& ray) const
 {
     switch (state_)
     {
@@ -32,18 +31,28 @@ void TRS::Update()
 {
     SetTransform();
 
-    Transform* t = stage_data_->GetSelectedTransform();
+    Transform* t = GetTarget();
     if (t == nullptr) return;
-
-    translation_->SetPosition(t->position);
-    rotation_->SetPosition(t->position);
-    scaling_->SetPosition(t->position);
-
+    
     // カメラ距離に応じてスケールを調整し、常に同じ見かけサイズを維持する
-    VECTOR3 cam_pos = GameDevice()->m_vEyePt;
-    translation_->UpdateScaleByCamera(cam_pos);
-    rotation_->UpdateScaleByCamera(cam_pos);
-    scaling_->UpdateScaleByCamera(cam_pos);
+    const VECTOR3 cam_pos = GameDevice()->m_vEyePt;
+    
+    if (translation_)
+    {
+        VECTOR3& p = t->position;
+        translation_->SetPosition(p);
+        translation_->UpdateScaleByCamera(cam_pos);
+    }
+    if (rotation_)
+    {
+        rotation_->SetPosition(t->position);
+        rotation_->UpdateScaleByCamera(cam_pos);
+    }
+    if (scaling_)
+    {
+        scaling_->SetPosition(t->position);
+        scaling_->UpdateScaleByCamera(cam_pos);
+    }
 }
 
 // ドラッグ中の軸に沿って選択オブジェクトのTransformを更新する
@@ -51,7 +60,7 @@ void TRS::SetTransform()
 {
     if (dragging_axis_ == Axis::None) return;
 
-    Transform* t = stage_data_->GetSelectedTransform();
+    Transform* t = GetTarget();
     if (t == nullptr) return;
 
     float delta = AddTransform(dragging_axis_, t->position);
@@ -125,6 +134,13 @@ void TRS::SnapRotation(float& compo, float delta)
     }
 }
 
+Transform* TRS::GetTarget()
+{
+    if (override_target_ != nullptr)
+        return override_target_;
+    return stage_data_->GetSelectedTransform();
+}
+
 // マウス移動量を指定軸のスクリーン投影ベクトルに射影し、ワールド空間の変化量を返す
 float TRS::AddTransform(Axis axis, const VECTOR3& objPos)
 {
@@ -172,6 +188,11 @@ float TRS::AddTransform(Axis axis, const VECTOR3& objPos)
     return dot / lenSq;
 }
 
+void TRS::SetOverrideTarget(Transform* t)
+{
+    override_target_ = t;
+}
+
 void TRS::Draw()
 {
     switch (state_)
@@ -204,7 +225,7 @@ void TRS::DrawImGui()
     ImGui::RadioButton("Scaling", &selected_, kScaling);
     ImGui::SameLine();
     ImGui::RadioButton("None", &selected_, kNone);
-
+    ImGui::Text("state : %d", selected_);
     ImGui::Separator();
 
     if (selected_ == kTranslation)

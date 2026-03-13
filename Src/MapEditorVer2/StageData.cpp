@@ -57,7 +57,6 @@ int StageData::RayHitTest(const Ray& ray,MeshCollider::CollInfo* collOut)
         MATRIX4X4 mat = stage_data_[i].transform_.matrix();
         if (coll->CheckCollisionLine(mat,ray.origin,to,&info))
         {
-            // 距離の二乗で比較（sqrt不要のため高速）
             float dist = (info.hitPosition - ray.origin).LengthSquare();
             if (dist < nearest)
             {
@@ -89,6 +88,7 @@ void StageData::Draw()
 {
     for (auto& data : stage_data_) {
         CFbxMesh* mesh = model_storage_->GetModel(data.model_name_);
+        if (mesh == nullptr) continue;
         mesh->Render(data.transform_.matrix());
     }
 }
